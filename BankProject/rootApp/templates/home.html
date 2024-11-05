@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <style>
+        .heading {
+            text-align: center;     /* Center the heading text */
+            margin-bottom: 20px;   /* Space between heading and tiles */
+            font-size: 24px;       /* Font size for the heading */
+            font-weight: bold;      /* Bold text for emphasis */
+        }
+
+        .tile {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .tile a {
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .tile a:hover {
+            color: #555;
+        }
+    </style>
+
+    <h2 class="heading">Welcome to My Bank</h2>  <!-- Use of the heading class -->
+    <div class="tiles-container">  <!-- Keep the tiles inside this container -->
+        <div class="tile">
+            <a href="{% url 'home' %}">Employees</a>
+        </div>
+    </div>
+{% endblock %}
