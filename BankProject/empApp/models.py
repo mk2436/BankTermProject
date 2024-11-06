@@ -1,11 +1,14 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class CustomUser(AbstractUser):
+    USER_TYPES = (
+        ('admin', 'Admin'),
+        ('employee', 'Employee'),
+    )
+    user_type = models.CharField(max_length=10, choices=USER_TYPES)
+
 
 
 class AccOwner(models.Model):
@@ -29,6 +32,15 @@ class Account(models.Model):
     class Meta:
         managed = False
         db_table = 'account'
+
+
+class AssistantMgr(models.Model):
+    bid = models.OneToOneField('Branch', models.DO_NOTHING, db_column='BID', primary_key=True)  # Field name made lowercase.
+    assistantmanager = models.ForeignKey('Employee', models.DO_NOTHING, db_column='ASSISTANTMANAGER', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'assistant_mgr'
 
 
 class AuthGroup(models.Model):
@@ -106,8 +118,6 @@ class Branch(models.Model):
     assets = models.DecimalField(db_column='Assets', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     city = models.CharField(db_column='City', max_length=100, blank=True, null=True)  # Field name made lowercase.
     address = models.CharField(db_column='Address', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    manager = models.ForeignKey('Employee', models.DO_NOTHING, db_column='Manager', blank=True, null=True)  # Field name made lowercase.
-    assistantmanager = models.ForeignKey('Employee', models.DO_NOTHING, db_column='AssistantManager', related_name='branch_assistantmanager_set', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -197,6 +207,15 @@ class Loans(models.Model):
     class Meta:
         managed = False
         db_table = 'loans'
+
+
+class Manager(models.Model):
+    bid = models.OneToOneField(Branch, models.DO_NOTHING, db_column='BID', primary_key=True)  # Field name made lowercase.
+    manager = models.ForeignKey(Employee, models.DO_NOTHING, db_column='MANAGER', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'manager'
 
 
 class PersonalBanker(models.Model):
