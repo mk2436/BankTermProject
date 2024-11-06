@@ -4,6 +4,7 @@ from empApp.forms import LoginForm, CreateCustomerForm
 from django.contrib.auth import authenticate, login, logout
 from empApp.models import CustomUser, Customer
 from django.db import transaction
+from empApp.decorators import role_required
 
 # Create your views here.
 def emp_login(request):
@@ -23,7 +24,7 @@ def emp_login(request):
         form = LoginForm()
         return render(request, 'empApp/emp-login.html', {'form': form, 'msg': 'Please Login to Continue'})
 
-@login_required(login_url='emp-login')
+
 def emp_logout(request):
     logout(request)
     return redirect('emp-login')
@@ -55,7 +56,7 @@ def mgr_login(request):
         form = LoginForm()
         return render(request, 'empApp/mgr-login.html', {'form': form, 'msg': 'Please Login to Continue'})
 
-
+@role_required('manager', 'assistanMgr', login_url='/mgr-login/')
 def create_customer(request):
     if request.method == 'POST':
         form = CreateCustomerForm(request.POST)
@@ -95,8 +96,6 @@ def create_customer(request):
                 return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer Does Not exist"})
             except Exception as e:
                 return render(request, 'empApp/create-customer.html', {'form':form,"msg": f"{e}"})
-            """
-            return render(request,"empApp/create-customer.html",{'form': form})"""
     else:
         form = CreateCustomerForm(request.POST)
         return render(request,"empApp/create-customer.html",{'form': form})

@@ -46,11 +46,15 @@
         <div class="tile">
             <a href="{% url 'home' %}">Employees</a>
         </div>
+        {% if user.is_authenticated %}
+            {% if user.user_type == "manager" or user.user_type == "assistanMgr"%}
         <div class="tile">
             <a href="{% url 'create-customer' %}">Create Customer</a>
         </div>
         <div class="tile">
             <a href="{% url 'del-customer' %}">Delete Customer</a>
         </div>
+            {% endif %}
+        {% endif %}
     </div>
 {% endblock %}
