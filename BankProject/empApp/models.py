@@ -51,13 +51,13 @@ class Account(models.Model):
 
 
 class AccOwner(models.Model):
-    cssn = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column='CSSN')  # Field name made lowercase. The composite primary key (CSSN, AccNo) found, that is not supported. The first column is selected.
+    customerid = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column='CustomerID', to_field='customerid')  # Field name made lowercase. The composite primary key (CSSN, AccNo) found, that is not supported. The first column is selected.
     accno = models.ForeignKey('Account', on_delete=models.CASCADE, db_column='AccNo')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'acc_owner'
-        unique_together = (('cssn', 'accno'),)
+        unique_together = (('customerid', 'accno'),)
 
 
 class AssistantMgr(models.Model):
@@ -111,7 +111,7 @@ class Employee(models.Model):
 
 
 class Loans(models.Model):
-    cssn = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CSSN', to_field='cssn', blank=True, null=True)  # Field name made lowercase.
+    customerid = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CustomerID', to_field='customerid', blank=True, null=True)  # Field name made lowercase.
     accno = models.ForeignKey(Account, on_delete=models.CASCADE, db_column='AccNo', blank=True, null=True)  # Field name made lowercase.
     bid = models.ForeignKey(Branch, on_delete=models.SET_NULL, db_column='BID', blank=True, null=True)  # Field name made lowercase.
     amount = models.DecimalField(db_column='Amount', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
@@ -133,9 +133,9 @@ class Manager(models.Model):
 
 
 class PersonalBanker(models.Model):
-    cssn = models.OneToOneField(Customer, on_delete=models.CASCADE, db_column='CSSN', to_field='cssn', primary_key=True)  # Field name made lowercase.
+    customerid = models.OneToOneField(Customer, on_delete=models.CASCADE, db_column='CustomerID', to_field='customerid', primary_key=True)  # Field name made lowercase.
     bid = models.ForeignKey(Branch, on_delete=models.SET_NULL, db_column='BID', blank=True, null=True)  # Field name made lowercase.
-    essn = models.ForeignKey(Employee, on_delete=models.SET_NULL, db_column='ESSN',blank=True, null=True)  # Field name made lowercase.
+    essn = models.ForeignKey(Employee, on_delete=models.SET_NULL, db_column='ESSN', to_field='ssn',blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

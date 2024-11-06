@@ -32,6 +32,17 @@
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
+        .tile-heading {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;          /* Darker color for the heading */
+        margin-bottom: 15px;     /* Space between heading and content */
+        text-transform: uppercase; /* Make the text uppercase */
+        letter-spacing: 1px;     /* Add some spacing between letters */
+        border-bottom: 2px solid #3498db; /* Add a bottom border for emphasis */
+        padding-bottom: 5px;     /* Space below the heading */
+        }
+
         .tile:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
@@ -49,6 +60,7 @@
     <h2 class="heading">User Profile</h2>  <!-- Use of the heading class -->
     <div class="tiles-container">  <!-- Keep the tiles inside this container -->
         <div class="tile">
+            <h2 class="tile-heading">Personal Info</h2>
             {% if data.name %}
             <h2>Name: {{ data.name }}</h2>
             {% endif %}
@@ -59,5 +71,19 @@
             <h2>BranchID: {{ data.bid }}</h2>
             {% endif %}
         </div>
+        {% if user.user_type == "customer" %}
+        <div class="tile">
+            <h2 class="tile-heading">Personal Banker</h2>
+            {% if banker.name %}
+            <h2>Name: {{ banker.name }}</h2>
+            {% endif %}
+            {% if banker.teleno %}
+            <h2>ID: {{ banker.teleno }}</h2>
+            {% endif %}
+            {% if banker.bid %}
+            <h2>BranchID: {{ banker.bid }}</h2>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 {% endblock %}

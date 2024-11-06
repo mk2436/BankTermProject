@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm
-from empApp.models import CustomUser, Customer, Employee
+from empApp.models import CustomUser, Customer, Employee, PersonalBanker
 from django.db import transaction
 from empApp.decorators import role_required
 
@@ -94,6 +94,16 @@ def create_customer(request):
                         aptno = aptno
                     )
                     newCustomer.save()
+
+                    loggedInEmployee = Employee.objects.get(empid=request.user.username)
+                    print(loggedInEmployee.ssn)
+                    newPersonalBanker = PersonalBanker.objects.create(
+                        customerid = newCustomer,
+                        bid = loggedInEmployee.bid,
+                        essn = loggedInEmployee
+                    )
+                    newPersonalBanker.save()
+
                     username = newCustomer.customerid
                     password = f"{'_'.join(newCustomer.name.split(' '))}@{cssn}"
                     user = CustomUser.objects.create_user(username=username, user_type='customer')
