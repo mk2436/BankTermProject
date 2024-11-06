@@ -16,8 +16,9 @@ def user_profile(request):
             employee = Employee.objects.get(empid=username)
             name = employee.name
             id = employee.empid
-            print(id)
-        return render(request, 'rootApp/user-profile.html', {'name':name, 'id': id})
+            bid = employee.bid.bid
+        data = {'name':name, 'id': id, 'bid':bid}
+        return render(request, 'rootApp/user-profile.html', {'data':data})
     except Employee.DoesNotExist:
         return render(request, 'rootApp/user-profile.html', {'name':'Not Available', 'ID': 'Not Available'})
     

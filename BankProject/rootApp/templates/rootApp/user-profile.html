@@ -49,8 +49,9 @@
     <h2 class="heading">User Profile</h2>  <!-- Use of the heading class -->
     <div class="tiles-container">  <!-- Keep the tiles inside this container -->
         <div class="tile">
-            <h2>Name: {{ name }}</h2>
-            <h2>ID: {{ id }}</h2>
+            <h2>Name: {{ data.name }}</h2>
+            <h2>ID: {{ data.id }}</h2>
+            <h2>BranchID: {{ data.bid }}</h2>
         </div>
     </div>
 {% endblock %}
