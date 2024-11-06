@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Search Customers</h1>
+    <form method="post" class="form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="form-button">Search</button>
+    </form>
+    
+    <select id="customerDropdown">
+        <form method="post">
+        {% for customer in customers %}
+            <option value="{{ customer.id }}">{{ customer.name }}</option>
+        {% endfor %}
+        <button type="submit" class="form-button">Apply Filter</button>
+        {% csrf_token %}
+        </form>
+    </select>
+</div>
+
+{% endblock %}

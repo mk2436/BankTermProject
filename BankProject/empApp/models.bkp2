@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -26,22 +25,20 @@ class CustomUser(AbstractUser):
         verbose_name="user permissions",
     )
 
-class Account(models.Model):
-    SAVINGS = 'Savings'
-    CHECKING = 'Checking'
-    MONEY_MARKET = 'Money Market'
-    LOAN = 'Loan'
+class AccOwner(models.Model):
+    cssn = models.OneToOneField('Customer', on_delete=models.CASCADE, db_column='CSSN', primary_key=True)  # Field name made lowercase. The composite primary key (CSSN, AccNo) found, that is not supported. The first column is selected.
+    accno = models.ForeignKey('Account', on_delete=models.CASCADE, db_column='AccNo')  # Field name made lowercase.
 
-    ACCOUNT_TYPE_CHOICES = [
-        (SAVINGS, 'Savings'),
-        (CHECKING, 'Checking'),
-        (MONEY_MARKET, 'Money Market'),
-        (LOAN, 'Loan'),
-    ]
-    
-    accno = models.AutoField(db_column='AccNo', primary_key=True)  # Field name made lowercase.
+    class Meta:
+        managed = False
+        db_table = 'acc_owner'
+        unique_together = (('cssn', 'accno'),)
+
+
+class Account(models.Model):
+    accno = models.IntegerField(db_column='AccNo', primary_key=True)  # Field name made lowercase.
     balance = models.DecimalField(db_column='Balance', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    type = models.CharField(db_column='Type', max_length=12, choices=ACCOUNT_TYPE_CHOICES, blank=True, null=True)  # Field name made lowercase.
+    type = models.CharField(db_column='Type', max_length=12, blank=True, null=True)  # Field name made lowercase.
     recentaccess = models.DateField(db_column='RecentAccess', blank=True, null=True)  # Field name made lowercase.
     interestsrate = models.DecimalField(db_column='InterestsRate', max_digits=5, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     overdraft = models.DecimalField(db_column='OverDraft', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
@@ -51,19 +48,9 @@ class Account(models.Model):
         db_table = 'account'
 
 
-class AccOwner(models.Model):
-    cssn = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column='CSSN')  # Field name made lowercase. The composite primary key (CSSN, AccNo) found, that is not supported. The first column is selected.
-    accno = models.ForeignKey('Account', on_delete=models.CASCADE, db_column='AccNo')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'acc_owner'
-        unique_together = (('cssn', 'accno'),)
-
-
 class AssistantMgr(models.Model):
     bid = models.OneToOneField('Branch', on_delete=models.CASCADE, db_column='BID', primary_key=True)  # Field name made lowercase.
-    assistantmanager = models.ForeignKey('Employee', on_delete=models.SET_NULL, db_column='ASSISTANTMANAGER', to_field='ssn', blank=True, null=True)  # Field name made lowercase.
+    assistantmanager = models.ForeignKey('Employee', on_delete=models.SET_NULL, db_column='ASSISTANTMANAGER', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -98,8 +85,7 @@ class Customer(models.Model):
 
 
 class Employee(models.Model):
-    empid = models.AutoField(db_column='EmpID', primary_key=True)  # Field name made lowercase.
-    ssn = models.IntegerField(db_column='SSN', unique=True, blank=True, null=True)  # Field name made lowercase.
+    ssn = models.IntegerField(db_column='SSN', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='Name', max_length=100, blank=True, null=True)  # Field name made lowercase.
     startdate = models.DateField(db_column='StartDate', blank=True, null=True)  # Field name made lowercase.
     teleno = models.CharField(db_column='TeleNo', max_length=15, blank=True, null=True)  # Field name made lowercase.
@@ -114,7 +100,7 @@ class Employee(models.Model):
 class Loans(models.Model):
     cssn = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CSSN', to_field='cssn', blank=True, null=True)  # Field name made lowercase.
     accno = models.ForeignKey(Account, on_delete=models.CASCADE, db_column='AccNo', blank=True, null=True)  # Field name made lowercase.
-    bid = models.ForeignKey(Branch, on_delete=models.SET_NULL, db_column='BID', blank=True, null=True)  # Field name made lowercase.
+    bid = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column='BID', blank=True, null=True)  # Field name made lowercase.
     amount = models.DecimalField(db_column='Amount', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     loanno = models.IntegerField(db_column='LoanNo', primary_key=True)  # Field name made lowercase.
     monthlyrepayment = models.DecimalField(db_column='MonthlyRepayment', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
@@ -125,8 +111,8 @@ class Loans(models.Model):
 
 
 class Manager(models.Model):
-    bid = models.OneToOneField(Branch, on_delete=models.CASCADE, db_column='BID', primary_key=True)  # Field name made lowercase.
-    manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, db_column='MANAGER', to_field='ssn', blank=True, null=True)  # Field name made lowercase.
+    bid = models.OneToOneField(Branch,  on_delete=models.CASCADE, db_column='BID', primary_key=True)  # Field name made lowercase.
+    manager = models.ForeignKey(Employee,on_delete=models.SET_NULL, db_column='MANAGER', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -134,29 +120,21 @@ class Manager(models.Model):
 
 
 class PersonalBanker(models.Model):
-    cssn = models.OneToOneField(Customer, on_delete=models.CASCADE, db_column='CSSN', to_field='cssn', primary_key=True)  # Field name made lowercase.
-    bid = models.ForeignKey(Branch, on_delete=models.SET_NULL, db_column='BID', blank=True, null=True)  # Field name made lowercase.
-    essn = models.ForeignKey(Employee, on_delete=models.SET_NULL, db_column='ESSN',blank=True, null=True)  # Field name made lowercase.
+    cssn = models.OneToOneField(Customer, on_delete=models.CASCADE, db_column='CSSN', primary_key=True)  # Field name made lowercase. The composite primary key (CSSN, BID, ESSN) found, that is not supported. The first column is selected.
+    bid = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column='BID')  # Field name made lowercase.
+    essn = models.ForeignKey(Employee, on_delete=models.CASCADE, db_column='ESSN')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'personal_banker'
+        unique_together = (('cssn', 'bid', 'essn'),)
 
 
 class Transaction(models.Model):
-    Credit = 'CD' 
-    Withdraw = 'WD'
-
-
-    Transaction_code_CHOICES = [
-        (Credit, 'Credit'),
-        (Withdraw, 'Withdraw'),
-    ]
-
-    tid = models.AutoField(db_column='TID', primary_key=True)  # Field name made lowercase. The composite primary key (TID, CSSN, AccNo) found, that is not supported. The first column is selected.
+    tid = models.IntegerField(db_column='TID', primary_key=True)  # Field name made lowercase. The composite primary key (TID, CSSN, AccNo) found, that is not supported. The first column is selected.
     cssn = models.IntegerField(db_column='CSSN')  # Field name made lowercase.
     accno = models.IntegerField(db_column='AccNo')  # Field name made lowercase.
-    code = models.CharField(db_column='Code', max_length=2, choices=Transaction_code_CHOICES, blank=True, null=True)  # Field name made lowercase.
+    code = models.CharField(db_column='Code', max_length=2, blank=True, null=True)  # Field name made lowercase.
     date = models.DateField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
     time = models.TimeField(db_column='Time', blank=True, null=True)  # Field name made lowercase.
     amount = models.DecimalField(db_column='Amount', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
