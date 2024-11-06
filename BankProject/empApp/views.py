@@ -35,7 +35,7 @@ def mgr_login(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             try:
-                user = CustomUser.objects.get(username='John_Doe')
+                user = CustomUser.objects.get(username=username)
                 print(user.password)
                 print(password)
             
