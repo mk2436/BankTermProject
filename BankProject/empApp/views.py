@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from empApp.forms import LoginForm, CreateCustomerForm
 from django.contrib.auth import authenticate, login, logout
-from empApp.models import CustomUser, Customer
+from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm
+from empApp.models import CustomUser, Customer, Employee
 from django.db import transaction
 from empApp.decorators import role_required
 
@@ -25,9 +25,9 @@ def emp_login(request):
         return render(request, 'empApp/emp-login.html', {'form': form, 'msg': 'Please Login to Continue'})
 
 
-def emp_logout(request):
+def user_logout(request):
     logout(request)
-    return redirect('emp-login')
+    return redirect('home')
 
 def mgr_login(request):
     if request.method == "POST":
@@ -99,6 +99,48 @@ def create_customer(request):
     else:
         form = CreateCustomerForm(request.POST)
         return render(request,"empApp/create-customer.html",{'form': form})
+    
+
+
+@role_required('manager', 'assistanMgr', login_url='/mgr-login/')
+def create_employee(request):
+    if request.method == 'POST':
+        form = CreateEmployeeForm(request.POST)
+        if form.is_valid():
+            ssn = form.cleaned_data['ssn']
+            name = form.cleaned_data['name']
+            startdate = form.cleaned_data['startdate']
+            teleno = form.cleaned_data['teleno']
+            dependentname = form.cleaned_data['dependentname']
+            bid = Employee.objects.get(empid=request.user.username).bid
+
+            try:
+                with transaction.atomic():
+
+                    newEmployee = Employee.objects.create(
+                        ssn = ssn,
+                        name = name,
+                        startdate = startdate,
+                        teleno = teleno,
+                        dependentname = dependentname,
+                        bid = bid,
+                    )
+                    newEmployee.save()
+
+                    username = newEmployee.empid
+                    password = f"{'_'.join(newEmployee.name.split(' '))}@{newEmployee.ssn}"
+
+                    user = CustomUser.objects.create_user(username=username,password=password, user_type='employee')
+                    user.save()
+                    return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee created Successfully"})
+            except Customer.DoesNotExist:
+                return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee Does Not exist"})
+            except Exception as e:
+                return render(request, 'empApp/create-emp.html', {'form':form,"msg": f"{e}"})
+    else:
+        form = CreateEmployeeForm(request.POST)
+        return render(request,"empApp/create-emp.html",{'form': form})
+
     
 def delete_customer(request):
     try:

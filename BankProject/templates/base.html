@@ -73,7 +73,8 @@
             <li><a href="{% url 'home' %}">Home</a></li>
 
             {% if user.is_authenticated %}
-            <li><a href="{% url 'emp-logout' %}">Logout</a></li>
+            <li><a href="{% url 'user-profile' %}">Profile</a></li>
+            <li><a href="{% url 'user-logout' %}">Logout</a></li>
             {% else %}
             <li><a href="{% url 'emp-login' %}">Employee Login</a></li>
             <li><a href="{% url 'mgr-login' %}">Manager Login</a></li>

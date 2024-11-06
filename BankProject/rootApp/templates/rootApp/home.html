@@ -43,11 +43,23 @@
 
     <h2 class="heading">Welcome to My Bank</h2>  <!-- Use of the heading class -->
     <div class="tiles-container">  <!-- Keep the tiles inside this container -->
-        <div class="tile">
-            <a href="{% url 'home' %}">Employees</a>
-        </div>
         {% if user.is_authenticated %}
             {% if user.user_type == "manager" or user.user_type == "assistanMgr"%}
+        <div class="tile">
+            <a href="{% url 'create-emp' %}">Create Employees</a>
+        </div>
+        <div class="tile">
+            <a href="{% url 'create-customer' %}">Create Customer</a>
+        </div>
+        <div class="tile">
+            <a href="{% url 'del-customer' %}">Delete Customer</a>
+        </div>
+            {% endif %}
+        {% endif %}
+
+
+        {% if user.is_authenticated %}
+            {% if user.user_type == "employee"%}
         <div class="tile">
             <a href="{% url 'create-customer' %}">Create Customer</a>
         </div>

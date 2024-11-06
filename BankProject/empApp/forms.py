@@ -18,6 +18,14 @@ class CreateCustomerForm(forms.Form):
     streetno = forms.IntegerField(label='Street No.',required=True)
     aptno = forms.CharField(label='Apt No.',required=True,max_length=100)
 
+class CreateEmployeeForm(forms.Form):
+    ssn = forms.IntegerField(label='Employee SSN',required=True)
+    name = forms.CharField(label='Employee Name', max_length=100, required=True)
+    startdate = forms.DateField(label='Start Date', required=True)
+    teleno = forms.CharField(label='Tele No',required=True)
+    dependentname = forms.CharField(label='Dependent Name', max_length=100)
+    
+
 class ListCustomers(forms.Form):
     cssn = forms.ChoiceField(label="Select an option",required=False)
     def __init__(self, *args, **kwargs):

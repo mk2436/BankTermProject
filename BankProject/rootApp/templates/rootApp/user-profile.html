@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <style>
+        .heading {
+            text-align: center;     /* Center the heading text */
+            margin-bottom: 20px;     /* Space between heading and tiles */
+            font-size: 24px;         /* Font size for the heading */
+            font-weight: bold;       /* Bold text for emphasis */
+        }
+
+        .tiles-container {
+            display: flex;           /* Align tiles in a row */
+            justify-content: center; /* Center the tiles horizontally */
+            gap: 20px;               /* Add space between tiles */
+        }
+
+        .tile {
+            background-color: #d2f3f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;            /* Increase width to fit name and ID */
+            height: 150px;
+            display: flex;
+            flex-direction: column;  /* Stack content vertically */
+            justify-content: center; /* Center the content vertically */
+            align-items: center;     /* Center content horizontally */
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .tile h2 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 5px 0;           /* Space between name and id */
+        }
+
+    </style>
+
+    <h2 class="heading">User Profile</h2>  <!-- Use of the heading class -->
+    <div class="tiles-container">  <!-- Keep the tiles inside this container -->
+        <div class="tile">
+            <h2>Name: {{ name }}</h2>
+            <h2>ID: {{ id }}</h2>
+        </div>
+    </div>
+{% endblock %}
