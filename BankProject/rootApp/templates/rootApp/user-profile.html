@@ -49,9 +49,15 @@
     <h2 class="heading">User Profile</h2>  <!-- Use of the heading class -->
     <div class="tiles-container">  <!-- Keep the tiles inside this container -->
         <div class="tile">
+            {% if data.name %}
             <h2>Name: {{ data.name }}</h2>
+            {% endif %}
+            {% if data.id %}
             <h2>ID: {{ data.id }}</h2>
+            {% endif %}
+            {% if data.bid %}
             <h2>BranchID: {{ data.bid }}</h2>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -36,27 +36,39 @@ def mgr_login(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             try:
-                user = CustomUser.objects.get(username=username)
-                print(user.password)
-                print(password)
-            
                 manager = authenticate(request, username=username, password=password)
-                
-                #print(manager.user_type)
                 if manager is not None and manager.user_type=='manager':
                     login(request,manager)
-                    print("done")
                     return redirect('home')
                 else:
                     return render(request,'empApp/mgr-login.html', {'form': form, 'msg': 'Invalid Manager Credentials'})
             except CustomUser.DoesNotExist:
                 return render(request,'empApp/mgr-login.html', {'form': form, 'msg': f'User Does not Exists!!'})
-
     else:
         form = LoginForm()
         return render(request, 'empApp/mgr-login.html', {'form': form, 'msg': 'Please Login to Continue'})
 
-@role_required('manager', 'assistanMgr', login_url='/mgr-login/')
+def customer_login(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            try:
+                customer = authenticate(request, username=username, password=password)
+                print(customer)
+                if customer is not None and customer.user_type=='customer':
+                    login(request,customer)
+                    return redirect('home')
+                else:
+                    return render(request,'empApp/cust-login.html', {'form': form, 'msg': 'Invalid Customer Credentials'})
+            except CustomUser.DoesNotExist:
+                return render(request,'empApp/cust-login.html', {'form': form, 'msg': f'User Does not Exists!!'})
+    else:
+        form = LoginForm()
+        return render(request, 'empApp/cust-login.html', {'form': form, 'msg': 'Please Login to Continue'})
+
+@role_required('manager', 'assistanMgr', 'employee', login_url='/')
 def create_customer(request):
     if request.method == 'POST':
         form = CreateCustomerForm(request.POST)
@@ -70,14 +82,9 @@ def create_customer(request):
             streetno = form.cleaned_data['streetno']
             aptno = form.cleaned_data['aptno']
   
-            username= '_'.join(name.split(' '))
-            password = f"{username}@{cssn}"
-            #print(password)
-            
             try:
                 with transaction.atomic():
-
-                    customer = Customer.objects.create(
+                    newCustomer = Customer.objects.create(
                         cssn = cssn,
                         name = name,
                         city = city,
@@ -86,10 +93,11 @@ def create_customer(request):
                         streetno = streetno,
                         aptno = aptno
                     )
-
-                    customer.save()
-
-                    user = CustomUser.objects.create_user(username=username,password=password, user_type='customer')
+                    newCustomer.save()
+                    username = newCustomer.customerid
+                    password = f"{'_'.join(newCustomer.name.split(' '))}@{cssn}"
+                    user = CustomUser.objects.create_user(username=username, user_type='customer')
+                    user.set_password(password)
                     user.save()
                     return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer created Successfully"})
             except Customer.DoesNotExist:
@@ -102,7 +110,7 @@ def create_customer(request):
     
 
 
-@role_required('manager', 'assistanMgr', login_url='/mgr-login/')
+@role_required('manager', 'assistanMgr', login_url='/')
 def create_employee(request):
     if request.method == 'POST':
         form = CreateEmployeeForm(request.POST)
@@ -130,7 +138,8 @@ def create_employee(request):
                     username = newEmployee.empid
                     password = f"{'_'.join(newEmployee.name.split(' '))}@{newEmployee.ssn}"
 
-                    user = CustomUser.objects.create_user(username=username,password=password, user_type='employee')
+                    user = CustomUser.objects.create_user(username=username,user_type='employee')
+                    user.set_password(password)
                     user.save()
                     return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee created Successfully"})
             except Customer.DoesNotExist:
