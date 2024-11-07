@@ -151,6 +151,8 @@ def open_account(request):
             customer = Customer.objects.get(customerid=selectID)
             # create account open form and display here
             openAccountForm = CreateAccountForm(request.POST)
+            if openAccountForm.is_valid():
+                pass
             return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Selected Customer:{customer.customerid}", 'oaform':openAccountForm})
         elif action=="list_all":
             return render(request, 'empApp/open-acc.html', {'customers': customers, 'data':customers})
