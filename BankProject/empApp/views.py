@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm
+from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker
 from django.db import transaction
 from empApp.decorators import role_required
@@ -150,7 +150,8 @@ def open_account(request):
         if selectID:
             customer = Customer.objects.get(customerid=selectID)
             # create account open form and display here
-            return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Selected Customer:{customer.customerid}"})
+            openAccountForm = CreateAccountForm(request.POST)
+            return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Selected Customer:{customer.customerid}", 'oaform':openAccountForm})
         elif action=="list_all":
             return render(request, 'empApp/open-acc.html', {'customers': customers, 'data':customers})
     return render(request, 'empApp/open-acc.html', {'customers': customers})

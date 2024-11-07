@@ -31,8 +31,10 @@
     <div class="Alert">{{ msg }}</div>
     {% endif %}
 </div>
-<div class="results-container">
-    {% if data %}
+
+{% if data %}
+    <div class="results-container">
+    
         <!-- This means data is iterable, like a list or queryset -->
         <ul>
             <table class="styled-table">
@@ -73,8 +75,19 @@
                 {% endif %}    
             </table>
         </ul>        
-    {% endif %}
-</div>
+    </div>
+{% endif %}
+
+    <div class="results-container">
+        <form method="post" class="list-all-form">
+            {% csrf_token %}
+            <div class="oaform-container">
+                {{ oaform }}
+                <button type="submit" class="form-button">Submit</button>
+            </div>
+        </form>
+    </div>
+
 
 <script type="text/javascript">
     function confirmDelete() {
@@ -84,6 +97,33 @@
 </script>
 
 <style>
+    .oaform-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .oaform-container input, .oaform-container select, .oaform-container textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .oaform-container input:focus, .oaform-container select:focus, .oaform-container textarea:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+
     .container {
         max-width: 600px;
         margin: 50px auto;

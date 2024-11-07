@@ -1,4 +1,22 @@
 from django import forms
+from .models import Account
+
+class CreateAccountForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ['accno', 'balance', 'type', 'recentaccess', 'interestsrate', 'overdraft']
+        labels = {
+            'accno': 'Account Number',
+            'balance': 'Balance',
+            'type': 'Account Type',
+            'recentaccess': 'Recent Access',
+            'interestsrate': 'Interest Rate',
+            'overdraft': 'Overdraft',
+        }
+        widgets = {
+            'recentaccess': forms.DateInput(attrs={'type': 'date'}),
+        }
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='Username', required=True)
