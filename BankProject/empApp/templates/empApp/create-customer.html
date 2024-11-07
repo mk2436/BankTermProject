@@ -5,6 +5,15 @@
 {% block content %}
 <style>
     /* Enhanced form styles */
+    .Alert {
+        text-align: center;
+        padding: 12px;
+        background-color: #ffecb3;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
     .container {
         max-width: 600px;
         margin: 50px auto;
@@ -75,6 +84,10 @@
 <div class="container">
     <h2>Create Customer</h2>
 
+    {% if msg %}
+        <div class="Alert">{{ msg }}</div>
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
 
@@ -123,6 +136,5 @@
 
         <button type="submit" class="btn btn-primary">Create Customer</button>
     </form>
-    {{ msg }}
 </div>
 {% endblock %}

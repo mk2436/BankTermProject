@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm
@@ -112,14 +112,18 @@ def create_customer(request):
                     return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer created Successfully"})
             except Customer.DoesNotExist:
                 return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer Does Not exist"})
+            except IntegrityError as e:
+                if 'Duplicate entry' in str(e):
+                    return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer already exists!"})
+                return render(request, 'empApp/create-customer.html', {'form':form,"msg": f"{e}"})
             except Exception as e:
                 return render(request, 'empApp/create-customer.html', {'form':form,"msg": f"{e}"})
     else:
-        form = CreateCustomerForm(request.POST)
+        form = CreateCustomerForm()
         return render(request,"empApp/create-customer.html",{'form': form})
+    return render(request, 'empApp/create-customer.html', {'form': CreateCustomerForm(), "msg": "Invalid request"})
+
     
-
-
 @role_required('manager', 'assistanMgr', login_url='/')
 def create_employee(request):
     if request.method == 'POST':
@@ -154,20 +158,42 @@ def create_employee(request):
                     return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee created Successfully"})
             except Customer.DoesNotExist:
                 return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee Does Not exist"})
+            except IntegrityError as e:
+                if 'Duplicate entry' in str(e):
+                    return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee already exists!"})
+                return render(request, 'empApp/create-emp.html', {'form':form,"msg": f"{e}"})  
             except Exception as e:
                 return render(request, 'empApp/create-emp.html', {'form':form,"msg": f"{e}"})
     else:
-        form = CreateEmployeeForm(request.POST)
+        form = CreateEmployeeForm()
         return render(request,"empApp/create-emp.html",{'form': form})
+    return render(request, 'empApp/create-emp.html', {'form': CreateEmployeeForm(), "msg": "Invalid request"})
 
-    
+
+@role_required('manager', 'assistanMgr', 'employee', login_url='/')
 def delete_customer(request):
     try:
         customers = Customer.objects.all()
-        choices = []
-        for customer in customers:
-            choices.append((f"{customers}"))
     except Exception as e:
         print(e)
-
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        customer_id = request.POST.get('customer')
+        action = request.POST.get('action')
+        if search_query:
+            try:
+                customer = Customer.objects.get(customerid=search_query)
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customer})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
+        elif customer_id:
+            try:
+                customer = Customer.objects.get(customerid=customer_id)
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customer})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
+        elif action:
+            return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customers})
+    
     return render(request, 'empApp/del-customer.html', {'customers': customers})

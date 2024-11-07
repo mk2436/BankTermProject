@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Create Customer{% endblock %}
+{% block title %}Create Employee{% endblock %}
 
 {% block content %}
 <style>
@@ -70,10 +70,24 @@
     .btn-primary:hover {
         background-color: #0056b3;
     }
+
+    .Alert {
+        text-align: center;
+        padding: 12px;
+        background-color: #ffecb3;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="container">
-    <h2>Create Customer</h2>
+    <h2>Create Employee</h2>
+
+    {% if msg %}
+        <div class="Alert">{{ msg }}</div>
+    {% endif %}
 
     <form method="post">
         {% csrf_token %}
@@ -109,8 +123,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Create Customer</button>
+        <button type="submit" class="btn btn-primary">Create Employee</button>
     </form>
-    {{ msg }}
 </div>
 {% endblock %}
