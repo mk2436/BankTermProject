@@ -52,7 +52,7 @@
                             <td>{{ item.city }}</td>
                             <form method="post" class="list-all-form">
                                 {% csrf_token %}
-                                <td><button type="submit"  name="select" value="{{ data.customerid }}" class="delete-button">Select</button></td>
+                                <td><button type="submit"  name="select" value="{{ item.customerid }}" class="delete-button">Select</button></td>
                             </form>
                         </tr>
                     </tbody>

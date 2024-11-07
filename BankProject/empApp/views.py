@@ -136,7 +136,11 @@ def open_account(request):
         action = request.POST.get('action')
         selectID = request.POST.get('select')
         if search_query:
-            pass
+            try:
+                customer = Customer.objects.get(customerid=search_query)
+                return render(request, 'empApp/open-acc.html', {'customers': customers, 'data':customer})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':'Customer Not Found'})
         if customer_id:
             try:
                 customer = Customer.objects.get(customerid=customer_id)
@@ -145,6 +149,7 @@ def open_account(request):
                 return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':'Customer Not Found'})
         if selectID:
             customer = Customer.objects.get(customerid=selectID)
+            # create account open form and display here
             return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Selected Customer:{customer.customerid}"})
         elif action=="list_all":
             return render(request, 'empApp/open-acc.html', {'customers': customers, 'data':customers})
