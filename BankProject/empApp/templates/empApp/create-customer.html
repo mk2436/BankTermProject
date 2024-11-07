@@ -4,65 +4,76 @@
 
 {% block content %}
 <style>
-    /* Custom styles */
+    /* Enhanced form styles */
     .container {
-        max-width: 600px; /* Center the form and limit its width */
-        margin: auto; /* Center horizontally */
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     }
 
     h2 {
-        color: #007bff; /* Change the title color */
-        text-align: center; /* Center the title */
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
     }
 
     .form-row {
-        display: flex; /* Use flexbox for rows */
-        justify-content: space-between; /* Space between fields */
-        margin-bottom: 1.5rem; /* Spacing between form fields */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
     }
 
     .form-group {
-        flex: 0 0 calc(50% - 10px); /* Make form groups take up 50% of the row minus space */
-        margin-right: 100px; /* Add right margin to create space between columns */
-    }
-
-    /* Remove margin from the last item in each row */
-    .form-row .form-group:last-child {
-        margin-right: 0; /* No margin on the last item to avoid extra space */
+        flex: 0 0 calc(48% - 10px);
+        margin-bottom: 15px;
     }
 
     .form-group label {
-        display: block; /* Ensure label is on a new line */
-        margin-bottom: 0.5rem; /* Space between label and input */
-        font-weight: bold; /* Make the label bold */
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #555;
     }
 
     .form-group input {
-        width: 100%; /* Full-width input */
-        padding: 0.5rem; /* Padding inside input */
-        border: 1px solid #ced4da; /* Border styling */
-        border-radius: 0.25rem; /* Rounded corners */
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
     }
 
     .btn-primary {
-        background-color: #007bff; /* Customize button color */
-        border: none; /* Remove border */
-        padding: 0.75rem 1.25rem; /* Add padding for the button */
-        width: 100%; /* Full-width button */
-        margin-top: 1rem; /* Space above button */
+        width: 100%;
+        background-color: #007bff;
+        border: none;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        margin-top: 15px;
     }
 
     .btn-primary:hover {
-        background-color: #0056b3; /* Darker color on hover */
-    }
-
-    .bg-light {
-        background-color: #f8f9fa !important; /* Light background for form */
+        background-color: #0056b3;
     }
 </style>
 
-<div class="container mt-5">
-    <h2 class="mb-4">Create Customer</h2>
+<div class="container">
+    <h2>Create Customer</h2>
 
     <form method="post">
         {% csrf_token %}
@@ -108,8 +119,6 @@
                 <label for="{{ form.aptno.id_for_label }}">{{ form.aptno.label }}</label>
                 {{ form.aptno }}
             </div>
-
-            <!-- Optional: You can add another input here if needed -->
         </div>
 
         <button type="submit" class="btn btn-primary">Create Customer</button>
