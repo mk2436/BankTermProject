@@ -49,12 +49,6 @@
             <a href="{% url 'create-emp' %}">Create Employees</a>
         </div>
         <div class="tile">
-            <a href="{% url 'create-customer' %}">Create Customer</a>
-        </div>
-        <div class="tile">
-            <a href="{% url 'del-customer' %}">Delete Customer</a>
-        </div>
-        <div class="tile">
             <a href="{% url 'del-employee' %}">Delete Employee</a>
         </div>
             {% endif %}
@@ -62,12 +56,15 @@
 
 
         {% if user.is_authenticated %}
-            {% if user.user_type == "employee"%}
+            {% if user.user_type == "employee" or user.user_type == "manager" or user.user_type == "assistanMgr" %}
         <div class="tile">
             <a href="{% url 'create-customer' %}">Create Customer</a>
         </div>
         <div class="tile">
             <a href="{% url 'del-customer' %}">Delete Customer</a>
+        </div>
+        <div class="tile">
+            <a href="{% url 'open-acc' %}">Open Account</a>
         </div>
             {% endif %}
         {% endif %}

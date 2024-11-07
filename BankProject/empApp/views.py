@@ -123,6 +123,34 @@ def create_customer(request):
         return render(request,"empApp/create-customer.html",{'form': form})
     return render(request, 'empApp/create-customer.html', {'form': CreateCustomerForm(), "msg": "Invalid request"})
 
+@role_required('manager', 'assistanMgr', 'employee', login_url='/')
+def open_account(request):
+    try:
+        customers = Customer.objects.all()
+    except Exception as e:
+        return render(request, 'empApp/open-acc.html', {'msg':f'Error!! {e}'})
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        customer_id = request.POST.get('customer')
+        action = request.POST.get('action')
+        selectID = request.POST.get('select')
+        if search_query:
+            pass
+        if customer_id:
+            try:
+                customer = Customer.objects.get(customerid=customer_id)
+                return render(request, 'empApp/open-acc.html', {'customers': customers, 'data':customer})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':'Customer Not Found'})
+        if selectID:
+            customer = Customer.objects.get(customerid=selectID)
+            return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Selected Customer:{customer.customerid}"})
+        elif action=="list_all":
+            return render(request, 'empApp/open-acc.html', {'customers': customers, 'data':customers})
+    return render(request, 'empApp/open-acc.html', {'customers': customers})
+
+
     
 @role_required('manager', 'assistanMgr', login_url='/')
 def create_employee(request):
