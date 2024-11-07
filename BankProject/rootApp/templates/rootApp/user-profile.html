@@ -85,5 +85,22 @@
             {% endif %}
         </div>
         {% endif %}
+        {% if user.user_type == "manager" %}
+        <div class="tile">
+            <h2 class="tile-heading">Managed Branch</h2>
+            {% if branch.name %}
+            <h2>Name: {{ branch.name }}</h2>
+            {% endif %}
+            {% if branch.city %}
+            <h2>City: {{ branch.city }}</h2>
+            {% endif %}
+            {% if branch.address %}
+            <h2>Address: {{ branch.address }}</h2>
+            {% endif %}
+            {% if branch.id %}
+            <h2>BranchID: {{ branch.id }}</h2>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 {% endblock %}

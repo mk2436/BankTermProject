@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from empApp.decorators import role_required
-from empApp.models import Employee, Customer, PersonalBanker
+from empApp.models import Employee, Customer, PersonalBanker, Manager
 # Create your views here.
 
 def home(request):
@@ -17,7 +17,19 @@ def user_profile(request):
             personalBanker = PersonalBanker.objects.get(customerid=id)
             bid = personalBanker.essn.bid.bid
             data = {'name':name, 'id': id}
+            branch = {}
             banker = {'name':personalBanker.essn.name, 'teleno': personalBanker.essn.teleno,'bid':bid}
+        elif request.user.user_type in ("manager", "assistanMgr") :
+            employee = Employee.objects.get(empid=username)
+            name = employee.name
+            id = employee.empid
+            bid = employee.bid.bid
+            data = {'name':name, 'id': id, 'bid':bid}
+
+            branch = Manager.objects.get(manager=employee.ssn)
+            branch = {'name': branch.bid.name, 'city':branch.bid.city, 'address': branch.bid.address, 'id': branch.bid.bid}
+            banker = {}
+            
         else:
             employee = Employee.objects.get(empid=username)
             name = employee.name
@@ -25,7 +37,8 @@ def user_profile(request):
             bid = employee.bid.bid
             data = {'name':name, 'id': id, 'bid':bid}
             banker = {}
-        return render(request, 'rootApp/user-profile.html', {'data':data, 'banker':banker})
+            branch = {}
+        return render(request, 'rootApp/user-profile.html', {'data':data, 'banker':banker, 'branch':branch})
     except Employee.DoesNotExist:
         return render(request, 'rootApp/user-profile.html', {'name':'Not Available', 'ID': 'Not Available'})
     
