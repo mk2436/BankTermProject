@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from rootApp.views import home, user_profile
-from empApp.views import emp_login, mgr_login, user_logout, create_customer, delete_customer, create_employee, customer_login
+from empApp.views import emp_login, mgr_login, user_logout, create_customer, delete_customer, delete_employee, create_employee, customer_login
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,5 +13,6 @@ urlpatterns = [
     path('user-logout/',user_logout, name='user-logout'),
     path('emp/create-customer/', create_customer, name = 'create-customer'),
     path('mgr/create-emp/', create_employee, name='create-emp' ),
-    path('emp/del-customer/',delete_customer, name = 'del-customer')
+    path('emp/del-customer/',delete_customer, name = 'del-customer'),
+    path('mgr/del-employee/',delete_employee, name = 'del-employee'),
 ]

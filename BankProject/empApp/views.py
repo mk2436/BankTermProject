@@ -175,7 +175,7 @@ def delete_customer(request):
     try:
         customers = Customer.objects.all()
     except Exception as e:
-        print(e)
+        return render(request, 'empApp/del-customer.html', {'msg':f'Error!! {e}'})
     
     if request.method == 'POST':
         search_query = request.POST.get('search_query')
@@ -205,3 +205,42 @@ def delete_customer(request):
             return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg': f"Customer {deleteid} deleted"})
     
     return render(request, 'empApp/del-customer.html', {'customers': customers})
+
+
+@role_required('manager', 'assistanMgr', login_url='/')
+def delete_employee(request):
+    try:
+        employees = Employee.objects.filter(bid = Employee.objects.get(empid=request.user.username).bid)
+    except Exception as e:
+        return render(request, 'empApp/del-employee.html', {'msg':f'Error!! {e}'})
+
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        employee_id = request.POST.get('employee')
+        action = request.POST.get('action')
+        deleteid = request.POST.get('delete')
+        
+        print(employee_id)
+        if search_query:
+            try:
+                employee = Employee.objects.get(empid=search_query)
+                return render(request, 'empApp/del-employee.html', {'employees': employees, 'data':employee})
+            except Employee.DoesNotExist as e:
+                return render(request, 'empApp/del-employee.html', {'employees': employees, 'msg':'employee Not Found'})
+        elif employee_id:
+            try:
+                employee = Employee.objects.get(empid=employee_id)
+                return render(request, 'empApp/del-employee.html', {'employees': employees, 'data':employee})
+            except Employee.DoesNotExist as e:
+                return render(request, 'empApp/del-employee.html', {'employees': employees, 'msg':'employee Not Found'})
+        elif action=="list_all":
+            return render(request, 'empApp/del-employee.html', {'employees': employees, 'data':employees})
+        elif deleteid:
+            with transaction.atomic():
+                employee = Employee.objects.get(empid=deleteid)
+                user = CustomUser.objects.get(username=deleteid)
+                employee.delete()
+                user.delete()
+            return render(request, 'empApp/del-employee.html', {'employees': employees, 'msg': f"employee {deleteid} deleted"})
+    
+    return render(request, 'empApp/del-employee.html', {'employees': employees})
