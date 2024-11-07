@@ -68,5 +68,19 @@
         </div>
             {% endif %}
         {% endif %}
+
+        {% if not user.is_authenticated %}
+            <div class="tile">
+                <a href="{% url 'emp-login' %}">Employee Login</a>
+            </div>
+            <div class="tile">
+                <a href="{% url 'mgr-login' %}">Manager Login</a>
+            </div>
+            <div class="tile">
+                <a href="{% url 'cust-login' %}">Customer Login</a>
+            </div>
+
+        {% endif %}
+
     </div>
 {% endblock %}
