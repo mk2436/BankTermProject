@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Delete Customer{% endblock %}
+
 {% block content %}
 <div class="container">
     <h1>Search Customers</h1>
@@ -31,42 +33,8 @@
 </div>
 <div class="results-container">
     {% if data %}
-
-        {% if data|length %}
-            <!-- This means data is iterable, like a list or queryset -->
-            <ul>
-                {% for item in data %}
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th>CustomerID</th>
-                            <th>Name</th>
-                            <th>City</th>
-                            <th>Account No</th>
-                            <th>Balance</th>
-                            <th>Account Type</th>
-                            <th>Recent Access</th>
-                            <th>Interest Rate</th>
-                            <th>Overdraft</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ item.customerid }}</td>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.city }}</td>
-                            <td>{{ item.accno.accno }}</td>
-                            <td>{{ item.accno.balance }}</td>
-                            <td>{{ item.accno.type }}</td>
-                            <td>{{ item.accno.recentaccess }}</td>
-                            <td>{{ item.accno.interestsrate }}</td>
-                            <td>{{ item.accno.overdraft }}</td>
-                        </tr>
-                    </tbody>
-                </table>    
-                {% endfor %}
-            </ul>
-        {% else %}
+        <!-- This means data is iterable, like a list or queryset -->
+        <ul>
             <table class="styled-table">
                 <thead>
                     <tr>
@@ -81,23 +49,53 @@
                         <th>Overdraft</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ data.customerid }}</td>
-                        <td>{{ data.name }}</td>
-                        <td>{{ data.city }}</td>
-                        <td>{{ data.accno.accno }}</td>
-                        <td>{{ data.accno.balance }}</td>
-                        <td>{{ data.accno.type }}</td>
-                        <td>{{ data.accno.recentaccess }}</td>
-                        <td>{{ data.accno.interestsrate }}</td>
-                        <td>{{ data.accno.overdraft }}</td>
-                    </tr>
-                </tbody>
+                {% if data|length %}
+                    {% for item in data %}
+                    <tbody>
+                        <tr>
+                            <td>{{ item.customerid }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.city }}</td>
+                            <td>{{ item.accno.accno }}</td>
+                            <td>{{ item.accno.balance }}</td>
+                            <td>{{ item.accno.type }}</td>
+                            <td>{{ item.accno.recentaccess }}</td>
+                            <td>{{ item.accno.interestsrate }}</td>
+                            <td>{{ item.accno.overdraft }}</td>
+                        </tr>
+                    </tbody>
+                    {% endfor %}
+            
+                {% else %}
+                    <tbody>
+                        <tr>
+                            <td>{{ data.customerid }}</td>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.city }}</td>
+                            <td>{{ data.accno.accno }}</td>
+                            <td>{{ data.accno.balance }}</td>
+                            <td>{{ data.accno.type }}</td>
+                            <td>{{ data.accno.recentaccess }}</td>
+                            <td>{{ data.accno.interestsrate }}</td>
+                            <td>{{ data.accno.overdraft }}</td>
+                            <form method="post" class="list-all-form" onsubmit="return confirmDelete()">
+                                {% csrf_token %}
+                                <td><button type="submit"  name="delete" value="{{ data.customerid }}" class="delete-button">Delete</button></td>
+                            </form>
+                        </tr>
+                    </tbody>
+                {% endif %}    
             </table>
-            {% endif %}        
+        </ul>        
     {% endif %}
 </div>
+
+<script type="text/javascript">
+    function confirmDelete() {
+        // Show confirmation dialog before submitting the form
+        return confirm("Are you sure you want to delete this customer?");
+    }
+</script>
 
 <style>
     .container {
@@ -154,6 +152,17 @@
         font-size: 14px;
         border: 1px solid #ccc;
         border-radius: 5px;
+    }
+
+    .delete-button{
+        padding: 5px 10px;
+        font-size: 14px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
 
     .form-button {

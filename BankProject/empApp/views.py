@@ -109,7 +109,7 @@ def create_customer(request):
                     user = CustomUser.objects.create_user(username=username, user_type='customer')
                     user.set_password(password)
                     user.save()
-                    return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer created Successfully"})
+                    return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer created Successfully", 'id': newCustomer.customerid})
             except Customer.DoesNotExist:
                 return render(request, 'empApp/create-customer.html', {'form':form,"msg": "Customer Does Not exist"})
             except IntegrityError as e:
@@ -155,7 +155,7 @@ def create_employee(request):
                     user = CustomUser.objects.create_user(username=username,user_type='employee')
                     user.set_password(password)
                     user.save()
-                    return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee created Successfully"})
+                    return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee created Successfully", 'id':newEmployee.empid})
             except Customer.DoesNotExist:
                 return render(request, 'empApp/create-emp.html', {'form':form,"msg": "Employee Does Not exist"})
             except IntegrityError as e:
@@ -181,6 +181,7 @@ def delete_customer(request):
         search_query = request.POST.get('search_query')
         customer_id = request.POST.get('customer')
         action = request.POST.get('action')
+        deleteid = request.POST.get('delete')
         if search_query:
             try:
                 customer = Customer.objects.get(customerid=search_query)
@@ -193,7 +194,14 @@ def delete_customer(request):
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customer})
             except Customer.DoesNotExist as e:
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
-        elif action:
+        elif action=="list_all":
             return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customers})
+        elif deleteid:
+            with transaction.atomic():
+                customer = Customer.objects.get(customerid=deleteid)
+                user = CustomUser.objects.get(username=deleteid)
+                customer.delete()
+                user.delete()
+            return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg': f"Customer {deleteid} deleted"})
     
     return render(request, 'empApp/del-customer.html', {'customers': customers})
