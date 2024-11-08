@@ -60,7 +60,20 @@ def customer_login(request):
                 print(customer)
                 if customer is not None and customer.user_type=='customer':
                     login(request,customer)
-                    return redirect('home')
+                    try:
+                        accOwner = AccOwner.objects.get(customerid=username)
+                        if accOwner is not None:
+                            with transaction.atomic():
+                                #print(accOwner.accno.recentaccess)
+                                lastLogin = CustomUser.objects.get(username=username).last_login
+                                #print(lastLogin)
+                                accOwner.accno.recentaccess = lastLogin
+                                #print(accOwner.accno.recentaccess)
+                                accOwner.accno.save()
+                    except AccOwner.DoesNotExist:
+                        pass
+                    finally:
+                        return redirect('home')
                 else:
                     return render(request,'empApp/cust-login.html', {'form': form, 'msg': 'Invalid Customer Credentials'})
             except CustomUser.DoesNotExist:
@@ -173,7 +186,7 @@ def open_account(request):
                 try:
                     with transaction.atomic():
                         accData = openAccountForm.save(commit=False)
-                        accData.recentaccess = datetime.date.today().strftime('%Y-%m-%d')
+                        accData.recentaccess = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         accData.save()
                         customer = Customer.objects.get(customerid=request.POST.get('customerid'))
                         accOwner = AccOwner.objects.create(accno=accData,customerid=customer)

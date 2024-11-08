@@ -41,7 +41,7 @@ class Account(models.Model):
     accno = models.AutoField(db_column='AccNo', primary_key=True)  # Field name made lowercase.
     balance = models.DecimalField(db_column='Balance', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     type = models.CharField(db_column='Type', max_length=12, choices=ACCOUNT_TYPE_CHOICES, blank=True, null=True)  # Field name made lowercase.
-    recentaccess = models.DateField(db_column='RecentAccess', blank=True, null=True)  # Field name made lowercase.
+    recentaccess = models.DateTimeField(db_column='RecentAccess', blank=True, null=True)  # Field name made lowercase.
     interestsrate = models.DecimalField(db_column='InterestsRate', max_digits=5, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     overdraft = models.DecimalField(db_column='OverDraft', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
 

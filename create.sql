@@ -69,7 +69,7 @@ CREATE TABLE CUSTOMER (
 );
 
 -- Set the starting value for CustomerID to 1000
-ALTER TABLE CUSTOMER AUTO_INCREMENT = 1000;
+ALTER TABLE CUSTOMER AUTO_INCREMENT = 100000;
 
 
 /*
@@ -87,7 +87,7 @@ CREATE TABLE ACCOUNT (
     AccNo INT AUTO_INCREMENT PRIMARY KEY,
     Balance DECIMAL(15, 2),
     Type ENUM('Savings', 'Checking', 'Money Market', 'Loan'),
-    RecentAccess DATE,
+    RecentAccess DATETIME,
     InterestsRate DECIMAL(5, 2),
     OverDraft DECIMAL(15, 2)
 );
@@ -96,7 +96,7 @@ ALTER TABLE ACCOUNT AUTO_INCREMENT = 3400001;
 CREATE TABLE ACC_OWNER (
     CustomerID INT,
     AccNo INT,
-    PRIMARY KEY (CSSN, AccNo)
+    PRIMARY KEY (CustomerID, AccNo)
 );
 
 
@@ -148,7 +148,7 @@ ADD FOREIGN KEY (AssistantManager) REFERENCES EMPLOYEE(SSN) ON DELETE SET NULL,
 ADD foreign key (BID) references branch(BID) ON DELETE CASCADE;
 
 ALTER TABLE ACC_OWNER
-ADD FOREIGN KEY (CSSN) REFERENCES CUSTOMER(CSSN) ON DELETE CASCADE,
+ADD FOREIGN KEY (CustomerID) REFERENCES CUSTOMER(CustomerID) ON DELETE CASCADE,
 ADD FOREIGN KEY (AccNo) REFERENCES ACCOUNT(AccNo) ON DELETE CASCADE;
 
 /*
@@ -171,13 +171,18 @@ select * from branch;
 select * from employee;
 
 select * from customer;
+select * from personal_banker;
 
+DELETE FROM customer where customerid=1015;
 
-DELETE FROM customer where customerid=1005;
-
-
+select * from acc_owner;
+select * from account;
+delete from account where accno=3400003;
 select * from empapp_customuser;
 
-delete from empapp_customuser where id =9;
+delete from empapp_customuser where id =11;
+
+select last_login from empapp_customuser where username='100016';
+select recentaccess from account join acc_owner on account.accno = acc_owner.accno where acc_owner.customerid='100016';
 
 
