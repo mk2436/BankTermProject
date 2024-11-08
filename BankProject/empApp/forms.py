@@ -1,21 +1,36 @@
 from django import forms
-from .models import Account
+from .models import Account, AccOwner, Customer
+from django.core.exceptions import ValidationError
 
 class CreateAccountForm(forms.ModelForm):
+    # Use ModelChoiceField to associate with Customer
+    customerid = forms.ModelChoiceField(queryset=Customer.objects.all(), label='Customer ID', widget=forms.HiddenInput)
+
     class Meta:
         model = Account
-        fields = ['accno', 'balance', 'type', 'recentaccess', 'interestsrate', 'overdraft']
+        fields = ['balance', 'type', 'interestsrate', 'overdraft', 'customerid']
         labels = {
-            'accno': 'Account Number',
+            'customerid': 'Customer ID',
             'balance': 'Balance',
             'type': 'Account Type',
-            'recentaccess': 'Recent Access',
             'interestsrate': 'Interest Rate',
             'overdraft': 'Overdraft',
         }
-        widgets = {
-            'recentaccess': forms.DateInput(attrs={'type': 'date'}),
-        }
+
+    def save(self, commit=True):
+        # First, save the Account instance
+        account = super().save(commit=False)
+
+        # Find the Customer instance by the customerid selected
+        customer = self.cleaned_data['customerid']
+
+        # Create and associate the AccOwner instance
+        if commit:
+            account.save()  # Save the Account instance first
+            AccOwner.objects.create(customerid=customer, accno=account)  # Link the Account to the Customer
+
+        return account
+
 
 
 class LoginForm(forms.Form):

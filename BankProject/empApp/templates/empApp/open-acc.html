@@ -6,7 +6,7 @@
 <div class="container">
     <h2>Search Customers</h2>
     <div class="form-container">
-        <form method="post" class="search-form">
+        <form method="post" class="search-form">    
             {% csrf_token %}
             <input type="text" name="search_query" placeholder="Search..." class="search-input">
             <button type="submit" class="form-button">Search</button>
@@ -83,7 +83,7 @@
             {% csrf_token %}
             <div class="oaform-container">
                 {{ oaform }}
-                <button type="submit" class="form-button">Submit</button>
+                <button type="submit" name = "oaform" class="form-button">Submit</button>
             </div>
         </form>
     </div>
@@ -100,6 +100,7 @@
 <style>
     .oaform-container {
     display: flex;
+    width: 200px;
     flex-direction: column;
     gap: 15px;
     padding: 20px;
@@ -127,7 +128,7 @@
 
     .container {
         max-width: 600px;
-        margin: 50px auto;
+        margin: 10px auto;
         padding: 20px;
         border-radius: 10px;
         background-color: #f9f9f9;
@@ -136,7 +137,7 @@
 
     .results-container {
         max-width: 1200px;
-        margin: 50px auto;
+        margin: 10px auto;
         padding: 20px;
         border-radius: 10px;
         background-color: #f9f9f9;
