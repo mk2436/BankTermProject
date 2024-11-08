@@ -2,9 +2,42 @@ from django import forms
 from .models import Account, AccOwner, Customer
 from django.core.exceptions import ValidationError
 
+from django import forms
+from .models import Account, Customer
+
 class CreateAccountForm(forms.ModelForm):
-    # Use ModelChoiceField to associate with Customer
-    customerid = forms.ModelChoiceField(queryset=Customer.objects.all(), label='Customer ID', widget=forms.HiddenInput)
+    # Use ModelChoiceField to associate with Customer (hidden input)
+    customerid = forms.ModelChoiceField(
+        queryset=Customer.objects.all(),
+        label='Customer ID',
+        widget=forms.HiddenInput,
+        required=True  # Make customerid field required
+    )
+    
+    # Override other fields to make them required
+    balance = forms.DecimalField(
+        label='Balance',
+        required=True,  # Make balance field required
+        min_value=0,    # Optionally set a minimum value, e.g., balance cannot be negative
+    )
+
+    type = forms.ChoiceField(
+        choices=Account.ACCOUNT_TYPE_CHOICES,  # This will use the choices from the Account model
+        required=True,  # Make type field required
+        label='Account Type'
+    )
+
+    interestsrate = forms.DecimalField(
+        label='Interest Rate',
+        required=True,  # Make interest rate field required
+        min_value=0,    # Optionally set a minimum value
+    )
+
+    overdraft = forms.DecimalField(
+        label='Overdraft',
+        required=True,  # Make overdraft field required
+        min_value=0,    # Optionally set a minimum value
+    )
 
     class Meta:
         model = Account

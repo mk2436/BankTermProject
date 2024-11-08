@@ -51,13 +51,14 @@ class Account(models.Model):
 
 
 class AccOwner(models.Model):
-    customerid = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column='CustomerID', to_field='customerid')  # Field name made lowercase. The composite primary key (CSSN, AccNo) found, that is not supported. The first column is selected.
-    accno = models.ForeignKey('Account', on_delete=models.CASCADE, db_column='AccNo')  # Field name made lowercase.
+    customerid = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column='CustomerID', to_field='customerid', primary_key=True)  # Field name made lowercase. The composite primary key (CSSN, AccNo) found, that is not supported. The first column is selected.
+    accno = models.ForeignKey('Account', on_delete=models.CASCADE, db_column='AccNo', to_field = 'accno')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'acc_owner'
         unique_together = (('customerid', 'accno'),)
+        
 
 
 class AssistantMgr(models.Model):

@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm
-from empApp.models import CustomUser, Customer, Employee, PersonalBanker
+from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -168,15 +168,19 @@ def open_account(request):
                 
         elif 'oaform' in request.POST:
             openAccountForm = CreateAccountForm(request.POST)
-            print(request.POST)
+            #print(request.POST)
             if openAccountForm.is_valid():
                 try:
-                    accData = openAccountForm.save(commit=False)
-                    accData.recentaccess = datetime.date.today().strftime('%Y-%m-%d')
-                    print(accData)
-                    print(openAccountForm.instance.customerid)
-                    #accData.save()
-                    return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Account Created", 'oaform':openAccountForm})
+                    with transaction.atomic():
+                        accData = openAccountForm.save(commit=False)
+                        accData.recentaccess = datetime.date.today().strftime('%Y-%m-%d')
+                        accData.save()
+                        customer = Customer.objects.get(customerid=request.POST.get('customerid'))
+                        accOwner = AccOwner.objects.create(accno=accData,customerid=customer)
+                        print(accOwner.accno, accOwner.customerid)
+                        accOwner.save()
+                        openAccountForm = CreateAccountForm()
+                        return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Account Created", 'oaform':openAccountForm})
                 except Exception as e:
                     openAccountForm = CreateAccountForm()
                     return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Failed to create Account {e}", 'oaform':openAccountForm})
