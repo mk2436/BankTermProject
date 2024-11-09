@@ -182,7 +182,8 @@ select * from empapp_customuser;
 
 delete from empapp_customuser where id =11;
 
-select last_login from empapp_customuser where username='100016';
-select recentaccess from account join acc_owner on account.accno = acc_owner.accno where acc_owner.customerid='100016';
+select last_login from empapp_customuser where username='100015';
+select recentaccess from account join acc_owner on account.accno = acc_owner.accno where acc_owner.customerid='100015';
 
-
+alter table account modify column recentaccess datetime;
+DESCRIBE account;
