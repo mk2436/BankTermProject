@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner
-from empApp.utils import list_all_users, list_user
+from empApp.utils import list_all_users, list_user, add_accowner
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -190,11 +190,16 @@ def open_account(request):
                         accData.recentaccess = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         accData.save()
                         customer = Customer.objects.get(customerid=request.POST.get('customerid'))
+                        """
                         accOwner = AccOwner.objects.create(accno=accData,customerid=customer)
                         print(accOwner.accno, accOwner.customerid)
                         accOwner.save()
-                        openAccountForm = CreateAccountForm()
-                        return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Account Created", 'oaform':openAccountForm})
+                        """
+                        data = add_accowner(request.POST.get('customerid'),accData.accno)
+                        if data:
+                            openAccountForm = CreateAccountForm()
+                            return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Account Created", 'oaform':openAccountForm})
+                        return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Account Creation Failed", 'oaform':openAccountForm})      
                 except Exception as e:
                     openAccountForm = CreateAccountForm()
                     return render(request, 'empApp/open-acc.html', {'customers': customers, 'msg':f"Failed to create Account {e}", 'oaform':openAccountForm})
@@ -276,13 +281,16 @@ def delete_customer(request):
             try:
                 customer = Customer.objects.get(customerid=customer_id)
                 data = list_user(customer_id)
-                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
+                if data:
+                    return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg': 'Unable to Fecth User'}) 
             except Customer.DoesNotExist as e:
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
         elif action=="list_all":
             data = list_all_users()
-            print(type(data))
-            return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
+            if data:
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
+            return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Unable the Fetch all users'})            
         elif deleteid:
             print(deleteid)
             with transaction.atomic():

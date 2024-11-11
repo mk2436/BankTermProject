@@ -1,5 +1,17 @@
 from django.db import IntegrityError, connection
 
+
+# Template for functions
+'''
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute()
+            rows = cursor.fetchall()
+            return rows
+    except Exception as e:
+        return
+'''
+
 def list_all_users():
     try:
         with connection.cursor() as cursor:
@@ -14,7 +26,7 @@ def list_all_users():
             rows = cursor.fetchall()
             return rows
     except Exception as e:
-        return e
+        return
     
 
 def list_user(customerid):
@@ -32,4 +44,19 @@ def list_user(customerid):
             rows = cursor.fetchall()
             return rows
     except Exception as e:
-        return e
+        return
+    
+
+def add_accowner(customerid,accno):
+    try:
+        with connection.cursor() as cursor:
+            print(customerid)
+            cursor.execute(
+                f"""
+                INSERT INTO ACC_OWNER (CustomerID, AccNo) VALUES
+                ({customerid},{accno});
+                """)
+            return "Success"
+    except Exception as e:
+        print(e)
+        return
