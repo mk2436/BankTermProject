@@ -1,8 +1,9 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner
+from empApp.utils import list_all_users
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -277,7 +278,9 @@ def delete_customer(request):
             except Customer.DoesNotExist as e:
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
         elif action=="list_all":
-            return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customers})
+            data = list_all_users()
+            print(type(data))
+            return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
         elif deleteid:
             with transaction.atomic():
                 customer = Customer.objects.get(customerid=deleteid)
@@ -326,3 +329,8 @@ def delete_employee(request):
             return render(request, 'empApp/del-employee.html', {'employees': employees, 'msg': f"employee {deleteid} deleted"})
     
     return render(request, 'empApp/del-employee.html', {'employees': employees})
+
+
+
+
+

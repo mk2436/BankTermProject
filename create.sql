@@ -187,3 +187,14 @@ select recentaccess from account join acc_owner on account.accno = acc_owner.acc
 
 alter table account modify column recentaccess datetime;
 DESCRIBE account;
+
+
+select *
+from customer as c
+join acc_owner as a on c.customerid=a.customerid
+join account as p on p.accno=a.accno;
+
+SELECT *
+FROM customer AS c
+LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
+LEFT JOIN account AS p ON p.accno = a.accno;

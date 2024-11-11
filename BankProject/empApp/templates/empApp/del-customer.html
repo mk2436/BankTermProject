@@ -53,15 +53,17 @@
                     {% for item in data %}
                     <tbody>
                         <tr>
-                            <td>{{ item.customerid }}</td>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.city }}</td>
-                            <td>{{ item.accno.accno }}</td>
-                            <td>{{ item.accno.balance }}</td>
-                            <td>{{ item.accno.type }}</td>
-                            <td>{{ item.accno.recentaccess }}</td>
-                            <td>{{ item.accno.interestsrate }}</td>
-                            <td>{{ item.accno.overdraft }}</td>
+                            <td>{{ item.0 }}</td>
+                            <td>{{ item.2 }}</td>
+                            <td>{{ item.3 }}</td>
+                            {% if item.8 %}
+                            <td>{{ item.8 }}</td>
+                            <td>{{ item.11 }}</td>
+                            <td>{{ item.12 }}</td>
+                            <td>{{ item.13 }}</td>
+                            <td>{{ item.14 }}</td>
+                            <td>{{ item.15 }}</td>
+                            {% endif %}
                         </tr>
                     </tbody>
                     {% endfor %}
@@ -69,6 +71,7 @@
                 {% else %}
                     <tbody>
                         <tr>
+                            <td>{{ data.customerid }}</td>
                             <td>{{ data.customerid }}</td>
                             <td>{{ data.name }}</td>
                             <td>{{ data.city }}</td>
