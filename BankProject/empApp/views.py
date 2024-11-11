@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner
-from empApp.utils import list_all_users
+from empApp.utils import list_all_users, list_user
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -268,13 +268,15 @@ def delete_customer(request):
         if search_query:
             try:
                 customer = Customer.objects.get(customerid=search_query)
-                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customer})
+                data = list_user(search_query)
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
             except Customer.DoesNotExist as e:
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
         elif customer_id:
             try:
                 customer = Customer.objects.get(customerid=customer_id)
-                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':customer})
+                data = list_user(customer_id)
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
             except Customer.DoesNotExist as e:
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
         elif action=="list_all":
@@ -282,13 +284,13 @@ def delete_customer(request):
             print(type(data))
             return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
         elif deleteid:
+            print(deleteid)
             with transaction.atomic():
                 customer = Customer.objects.get(customerid=deleteid)
                 user = CustomUser.objects.get(username=deleteid)
                 customer.delete()
                 user.delete()
             return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg': f"Customer {deleteid} deleted"})
-    
     return render(request, 'empApp/del-customer.html', {'customers': customers})
 
 

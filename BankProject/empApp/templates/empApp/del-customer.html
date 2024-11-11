@@ -49,7 +49,7 @@
                         <th>Overdraft</th>
                     </tr>
                 </thead>
-                {% if data|length %}
+                {% if data|length > 1 %}
                     {% for item in data %}
                     <tbody>
                         <tr>
@@ -71,19 +71,19 @@
                 {% else %}
                     <tbody>
                         <tr>
-                            <td>{{ data.customerid }}</td>
-                            <td>{{ data.customerid }}</td>
-                            <td>{{ data.name }}</td>
-                            <td>{{ data.city }}</td>
-                            <td>{{ data.accno.accno }}</td>
-                            <td>{{ data.accno.balance }}</td>
-                            <td>{{ data.accno.type }}</td>
-                            <td>{{ data.accno.recentaccess }}</td>
-                            <td>{{ data.accno.interestsrate }}</td>
-                            <td>{{ data.accno.overdraft }}</td>
+                            <td>{{ data.0.0 }}</td>
+                            <td>{{ data.0.2 }}</td>
+                            <td>{{ data.0.3 }}</td>
+
+                            <td>{{ data.0.8 }}</td>
+                            <td>{{ data.0.11 }}</td>
+                            <td>{{ data.0.12 }}</td>
+                            <td>{{ data.0.13 }}</td>
+                            <td>{{ data.0.14 }}</td>
+                            <td>{{ data.0.15 }}</td>  
                             <form method="post" class="list-all-form" onsubmit="return confirmDelete()">
                                 {% csrf_token %}
-                                <td><button type="submit"  name="delete" value="{{ data.customerid }}" class="delete-button">Delete</button></td>
+                                <td><button type="submit"  name="delete" value="{{ data.0.0 }}" class="delete-button">Delete</button></td>
                             </form>
                         </tr>
                     </tbody>
