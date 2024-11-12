@@ -6,7 +6,7 @@
 <div class="container">
     <h2>Search accounts</h2>
     <div class="form-container">
-        <form method="post" class="search-form">
+        <form method="post" class="search-form" style="width: 120px;">
             {% csrf_token %}
             <input type="text" name="search_query" placeholder="Search..." class="search-input">
             <button type="submit" class="form-button">Search</button>
