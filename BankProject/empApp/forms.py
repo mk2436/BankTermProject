@@ -98,3 +98,18 @@ class ListCustomers(forms.Form):
         choices = kwargs.pop('choices', [])
         super().__init__(*args, **kwargs)
         self.fields['cssn'].choices = choices
+
+
+class SendMoneyForm(forms.Form):
+    senderAccount = forms.ChoiceField(
+        choices = None,
+        label='Sender Account',
+        required=True,
+    )
+
+    receiverAccount = forms.CharField(
+        label='Receiver Account',
+        required=True,
+    )
+
+    

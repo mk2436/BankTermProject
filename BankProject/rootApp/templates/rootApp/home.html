@@ -70,6 +70,17 @@
         {% endif %}
 
         {% if user.is_authenticated %}
+            {% if user.user_type == "customer" %}
+                <div class="tile create-tile">
+                    <a href="{% url 'send-money' %}">Send Money</a>
+                </div>
+                <div class="tile delete-tile">
+                    <a href="{% url 'recv-money' %}">Recieve Money</a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if user.is_authenticated %}
             {% if user.user_type == "employee" or user.user_type == "manager" or user.user_type == "assistanMgr" %}
                 <div class="tile create-tile">
                     <a href="{% url 'create-customer' %}">Create Customer</a>

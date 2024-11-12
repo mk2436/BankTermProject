@@ -212,18 +212,6 @@ def open_account(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 @role_required('manager', 'assistanMgr', 'employee', login_url='/')
 def delete_account(request):
     try:
@@ -266,24 +254,6 @@ def delete_account(request):
                 account.delete()
             return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg': f"account {deleteid} deleted"})
     return render(request, 'empApp/del-account.html', {'accounts': accounts})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -421,4 +391,9 @@ def delete_employee(request):
 
 
 
+def send_money(request):
+    return render(request, 'empApp/send-money.html')
+
+def receive_money(request):
+    pass
 
