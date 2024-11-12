@@ -211,3 +211,5 @@ FROM account AS a
 LEFT JOIN acc_owner p ON p.accno = a.accno
 LEFT JOIN customer c ON c.customerid = p.customerid
 ;
+
+select * from transaction;

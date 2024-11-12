@@ -65,7 +65,7 @@
                             <td>{{ item.13 }}</td>
                             <form method="post" class="list-all-form" onsubmit="return confirmDelete()">
                                 {% csrf_token %}
-                                <td><button type="submit"  name="delete" value="{{ data.0.0 }}" class="delete-button">Delete</button></td>
+                                <td><button type="submit"  name="delete" value="{{ item.0 }}" class="delete-button">Delete</button></td>
                             </form>
                         </tr>
                     </tbody>
