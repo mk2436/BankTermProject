@@ -5,10 +5,10 @@
 {% block content %}
     <style>
         .heading {
-            text-align: center;     /* Center the heading text */
-            margin-bottom: 20px;   /* Space between heading and tiles */
-            font-size: 24px;       /* Font size for the heading */
-            font-weight: bold;      /* Bold text for emphasis */
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
         }
 
         .tile {
@@ -21,12 +21,27 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
         }
 
         .tile:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Create tile hover color */
+        .create-tile:hover {
+            background-color: #b6e7c2; /* Light green */
+        }
+
+        /* Delete tile hover color */
+        .delete-tile:hover {
+            background-color: #f8d7da; /* Light red */
+        }
+
+        /* Login tile hover color */
+        .login-tile:hover {
+            background-color: #d1ecf1; /* Light blue */
         }
 
         .tile a {
@@ -41,49 +56,46 @@
         }
     </style>
 
-    <h2 class="heading">Welcome to My Bank</h2>  <!-- Use of the heading class -->
-    <div class="tiles-container">  <!-- Keep the tiles inside this container -->
+    <h2 class="heading">Welcome to My Bank</h2>
+    <div class="tiles-container">
         {% if user.is_authenticated %}
-            {% if user.user_type == "manager" or user.user_type == "assistanMgr"%}
-        <div class="tile">
-            <a href="{% url 'create-emp' %}">Create Employees</a>
-        </div>
-        <div class="tile">
-            <a href="{% url 'del-employee' %}">Delete Employee</a>
-        </div>
+            {% if user.user_type == "manager" or user.user_type == "assistanMgr" %}
+                <div class="tile create-tile">
+                    <a href="{% url 'create-emp' %}">Create Employees</a>
+                </div>
+                <div class="tile delete-tile">
+                    <a href="{% url 'del-employee' %}">Delete Employee</a>
+                </div>
             {% endif %}
         {% endif %}
 
-
         {% if user.is_authenticated %}
             {% if user.user_type == "employee" or user.user_type == "manager" or user.user_type == "assistanMgr" %}
-        <div class="tile">
-            <a href="{% url 'create-customer' %}">Create Customer</a>
-        </div>
-        <div class="tile">
-            <a href="{% url 'del-customer' %}">Delete Customer</a>
-        </div>
-        <div class="tile">
-            <a href="{% url 'open-acc' %}">Open Account</a>
-        </div>
-        <div class="tile">
-            <a href="{% url 'del-account' %}">Delete Account</a>
-        </div>
+                <div class="tile create-tile">
+                    <a href="{% url 'create-customer' %}">Create Customer</a>
+                </div>
+                <div class="tile delete-tile">
+                    <a href="{% url 'del-customer' %}">Delete Customer</a>
+                </div>
+                <div class="tile create-tile">
+                    <a href="{% url 'open-acc' %}">Open Account</a>
+                </div>
+                <div class="tile delete-tile">
+                    <a href="{% url 'del-account' %}">Delete Account</a>
+                </div>
             {% endif %}
         {% endif %}
 
         {% if not user.is_authenticated %}
-            <div class="tile">
+            <div class="tile login-tile">
                 <a href="{% url 'emp-login' %}">Employee Login</a>
             </div>
-            <div class="tile">
+            <div class="tile login-tile">
                 <a href="{% url 'mgr-login' %}">Manager Login</a>
             </div>
-            <div class="tile">
+            <div class="tile login-tile">
                 <a href="{% url 'cust-login' %}">Customer Login</a>
             </div>
-
         {% endif %}
-
     </div>
 {% endblock %}
