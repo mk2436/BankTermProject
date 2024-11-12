@@ -60,3 +60,40 @@ def add_accowner(customerid,accno):
     except Exception as e:
         print(e)
         return
+    
+
+def list_all_accounts():
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT *
+                FROM account AS a
+                LEFT JOIN acc_owner p ON p.accno = a.accno
+                LEFT JOIN customer c ON c.customerid = p.customerid
+                ;
+                """
+            )
+            rows = cursor.fetchall()
+            return rows
+    except Exception as e:
+        return
+    
+
+def list_account(accno):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT *
+                FROM account AS a
+                LEFT JOIN acc_owner p ON p.accno = a.accno
+                LEFT JOIN customer c ON c.customerid = p.customerid
+                WHERE a.accno={accno}
+                ;
+                """
+            )
+            rows = cursor.fetchall()
+            return rows
+    except Exception as e:
+        return

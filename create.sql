@@ -198,3 +198,16 @@ SELECT *
 FROM customer AS c
 LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
 LEFT JOIN account AS p ON p.accno = a.accno;
+
+SELECT *
+FROM customer AS c
+LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
+LEFT JOIN account AS p ON p.accno = a.accno
+WHERE c.customerid = '100012';
+
+
+SELECT *
+FROM account AS a
+LEFT JOIN acc_owner p ON p.accno = a.accno
+LEFT JOIN customer c ON c.customerid = p.customerid
+;

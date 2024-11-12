@@ -2,8 +2,8 @@ from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm
-from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner
-from empApp.utils import list_all_users, list_user, add_accowner
+from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account
+from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -211,6 +211,82 @@ def open_account(request):
     return render(request, 'empApp/open-acc.html', {'customers': customers})
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+@role_required('manager', 'assistanMgr', 'employee', login_url='/')
+def delete_account(request):
+    try:
+        accounts = Account.objects.all()
+    except Exception as e:
+        return render(request, 'empApp/del-account.html', {'msg':f'Error!! {e}'})
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        account_id = request.POST.get('account')
+        action = request.POST.get('action')
+        deleteid = request.POST.get('delete')
+        if search_query:
+            try:
+                account = Account.objects.get(accno=search_query)
+                data = list_account(search_query)
+                if data:
+                    return render(request, 'empApp/del-account.html', {'accounts': accounts, 'data':data})
+                return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg':'Unable to Fetch Account'})
+            except Account.DoesNotExist as e:
+                return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg':'Account Not Found'})
+        elif account_id:
+            try:
+                account = Account.objects.get(accno=account_id)
+                data = list_account(account_id)
+                if data:
+                    return render(request, 'empApp/del-account.html', {'accounts': accounts, 'data':data})
+                return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg': 'Unable to Fecth Account'}) 
+            except Account.DoesNotExist as e:
+                return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg':'account Not Found'})
+        elif action=="list_all":
+            data = list_all_accounts()
+            if data:
+                return render(request, 'empApp/del-account.html', {'accounts': accounts, 'data':data})
+            return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg': 'Unable to fetch all Accounts'})
+        elif deleteid:
+            print(deleteid)
+            with transaction.atomic():
+                account = Account.objects.get(accno=deleteid)
+                account.delete()
+            return render(request, 'empApp/del-account.html', {'accounts': accounts, 'msg': f"account {deleteid} deleted"})
+    return render(request, 'empApp/del-account.html', {'accounts': accounts})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 @role_required('manager', 'assistanMgr', login_url='/')
 def create_employee(request):
@@ -274,7 +350,9 @@ def delete_customer(request):
             try:
                 customer = Customer.objects.get(customerid=search_query)
                 data = list_user(search_query)
-                return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
+                if data:
+                    return render(request, 'empApp/del-customer.html', {'customers': customers, 'data':data})
+                return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg': 'Unable to Fecth User'})
             except Customer.DoesNotExist as e:
                 return render(request, 'empApp/del-customer.html', {'customers': customers, 'msg':'Customer Not Found'})
         elif customer_id:
