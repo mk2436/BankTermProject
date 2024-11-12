@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account, AccOwner, Customer
+from .models import Account, AccOwner, Customer, Transaction
 from django.core.exceptions import ValidationError
 
 from django import forms
@@ -112,4 +112,18 @@ class SendMoneyForm(forms.Form):
         required=True,
     )
 
-    
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['cssn', 'accno', 'code', 'date', 'time', 'amount', 'charge']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
+            'code': forms.Select(choices=Transaction.Transaction_code_CHOICES),
+        }
+
+    def __init__(self, *args, **kwargs):
+        accno_choices = kwargs.pop('choices', [])
+        super().__init__(*args, **kwargs)
+        self.fields['accno'] = forms.ChoiceField(choices=accno_choices, label='Account Number')

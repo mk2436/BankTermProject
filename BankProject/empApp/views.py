@@ -397,3 +397,7 @@ def send_money(request):
 def receive_money(request):
     pass
 
+
+
+def withdraw(request):
+    return render(request, )
