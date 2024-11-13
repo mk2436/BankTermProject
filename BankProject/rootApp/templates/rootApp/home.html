@@ -71,10 +71,10 @@
 
         {% if user.is_authenticated %}
             {% if user.user_type == "customer" %}
-                <div class="tile create-tile">
+                <div class="tile delete-tile">
                     <a href="{% url 'send-money' %}">(NN)Send Money</a>
                 </div>
-                <div class="tile delete-tile">
+                <div class="tile create-tile">
                     <a href="{% url 'recv-money' %}">(NN)Recieve Money</a>
                 </div>
                 <div class="tile delete-tile">
