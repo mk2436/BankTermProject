@@ -1,5 +1,6 @@
 from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account
@@ -396,11 +397,6 @@ def send_money(request):
 def receive_money(request):
     pass
 
-
-from django.shortcuts import render, redirect
-from django.utils import timezone
-from .forms import TransactionForm
-from .models import Transaction, AccOwner, Customer
 
 def withdraw(request):
     try:
