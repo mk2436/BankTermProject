@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Withdraw Money{% endblock %}
+{% block title %}Deposit Money{% endblock %}
 
 {% block content %}
 <style>
@@ -16,7 +16,7 @@
     }
     .container {
         width: 100%;
-        max-width: 500px; /* Updated width */
+        max-width: 700px; /* Updated width */
         margin: 50px auto;
         padding: 30px;
         background-color: #ffffff;
@@ -85,7 +85,7 @@
 
 
 <div class="container">
-    <h2>Withdraw Money</h2>
+    <h2>Deposit Money</h2>
 
     {% if msg %}
         <div class="Alert">{{ msg }}<br></div>
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Withdraw</button>
+        <button type="submit" class="btn btn-primary">Deposit</button>
     </form>
 </div>
 
