@@ -406,30 +406,49 @@ def withdraw(request):
     try:
         customer = Customer.objects.get(customerid=request.user.username)
         accounts = AccOwner.objects.filter(customerid=request.user.username)
-        accno_choices = [(account.accno, account.accno.accno) for account in accounts if account.accno.type=="Checking"]
+        accno_choices = [(account.accno.accno, account.accno.accno) for account in accounts if account.accno.type=="Checking"]
         if not accounts.exists() or not accno_choices:
             return render(request, 'empApp/withdraw.html', {'msg': 'No Checking Bank Accounts Found'})
     except Customer.DoesNotExist:
         return render(request, 'empApp/withdraw.html', {'msg': 'Unable to fetch Customer'})
 
     if request.method == 'POST':
-        form = TransactionForm(request.POST, choices=accno_choices)
-        form.instance.cssn = customer
+        #print(request.POST)
+        form = TransactionForm(
+            request.POST, 
+            accno_choices=accno_choices,
+            )
+        '''form.instance.cssn = customer
         form.instance.date = timezone.now().date()
         form.instance.time = timezone.now().time() 
         form.instance.code = 'WD'
-
+        '''
+        
         if form.is_valid():
-            transaction = form.save(commit=False)
-            # Save the transaction
-            #transaction.save()
-            return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Succesful'})
+            accountNo = form.cleaned_data['accno']
+            withdrawAmount = form.cleaned_data['amount']
+            try:
+                account = Account.objects.get(accno=accountNo)
+                if account.balance-withdrawAmount > 0:
+                    with transaction.atomic():
+                        custTransaction = Transaction.objects.create(
+                            customerid = customer.customerid,
+                            accno = accountNo,
+                            date = timezone.now().date(),
+                            time = timezone.now().time(),
+                            code = 'WD',
+                            amount = withdrawAmount
+                        )
+                        
+                        account.balance -= withdrawAmount
+                        account.save()
+                        return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Succesful'})
+                return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
+            except Account.DoesNotExist:
+                return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Unable to Process Account'})
         print(form.errors)
         return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Unsuccesful'})
         
     else:
-        form = TransactionForm(choices=accno_choices)
+        form = TransactionForm(accno_choices=accno_choices)
     return render(request, 'empApp/withdraw.html', {'form': form})
-    
-def calculate_charge(amount):
-    return amount * 0.02  

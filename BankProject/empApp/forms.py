@@ -113,8 +113,6 @@ class SendMoneyForm(forms.Form):
     )
 
 
-from django import forms
-from .models import Transaction
 
 class TransactionForm(forms.Form):
     CREDIT = 'CD'
@@ -124,13 +122,13 @@ class TransactionForm(forms.Form):
         (WITHDRAW, 'Withdraw'),
     ]
 
-    cssn = forms.IntegerField(label='CSSN')
+    #cssn = forms.IntegerField(label='CSSN')
     accno = forms.ChoiceField(label='Account Number')
-    code = forms.ChoiceField(choices=TRANSACTION_CHOICES, required=False, label='Transaction Type')
-    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label='Date')
-    time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}), required=False, label='Time')
+    #code = forms.ChoiceField(choices=TRANSACTION_CHOICES, required=False, label='Transaction Type')
+    #date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label='Date')
+    #time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}), required=False, label='Time')
     amount = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label='Amount', widget=forms.NumberInput(attrs={'step': '0.01'}))
-    charge = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label='Charge', widget=forms.NumberInput(attrs={'step': '0.01'}))
+    #charge = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label='Charge', widget=forms.NumberInput(attrs={'step': '0.01'}))
 
     # Override the __init__ method to accept dynamic choices
     def __init__(self, *args, **kwargs):

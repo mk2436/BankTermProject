@@ -154,7 +154,7 @@ class Transaction(models.Model):
     ]
 
     tid = models.AutoField(db_column='TID', primary_key=True)  # Field name made lowercase. The composite primary key (TID, CSSN, AccNo) found, that is not supported. The first column is selected.
-    cssn = models.IntegerField(db_column='CSSN')  # Field name made lowercase.
+    customerid = models.IntegerField(db_column='CustomerID')  # Field name made lowercase.
     accno = models.IntegerField(db_column='AccNo')  # Field name made lowercase.
     code = models.CharField(db_column='Code', max_length=2, choices=Transaction_code_CHOICES, blank=True, null=True)  # Field name made lowercase.
     date = models.DateField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
@@ -165,4 +165,4 @@ class Transaction(models.Model):
     class Meta:
         managed = False
         db_table = 'transaction'
-        unique_together = (('tid', 'cssn', 'accno'),)
+        unique_together = (('tid', 'customerid', 'accno'),)
