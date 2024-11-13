@@ -121,19 +121,26 @@ class TransactionForm(forms.Form):
         (CREDIT, 'Credit'),
         (WITHDRAW, 'Withdraw'),
     ]
-
-    #cssn = forms.IntegerField(label='CSSN')
     accno = forms.ChoiceField(label='Account Number')
-    #code = forms.ChoiceField(choices=TRANSACTION_CHOICES, required=False, label='Transaction Type')
-    #date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label='Date')
-    #time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}), required=False, label='Time')
-    amount = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label='Amount', widget=forms.NumberInput(attrs={'step': '0.01'}))
-    #charge = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label='Charge', widget=forms.NumberInput(attrs={'step': '0.01'}))
-
-    # Override the __init__ method to accept dynamic choices
+    amount = forms.DecimalField(max_digits=15, decimal_places=2, required=True, label='Amount', widget=forms.NumberInput(attrs={'step': '0.01'}))
+    
     def __init__(self, *args, **kwargs):
         accno_choices = kwargs.pop('accno_choices', [])
         super(TransactionForm, self).__init__(*args, **kwargs)
-        
-        # Set dynamic choices for the accno field
+        self.fields['accno'].choices = accno_choices
+
+
+class SendMoneyForm(forms.Form):
+    CREDIT = 'CD'
+    TRANSACTION_CHOICES = [
+        (CREDIT, 'Credit'),
+    ]
+
+    accno = forms.ChoiceField(label='Account Number')
+    amount = forms.DecimalField(max_digits=15, decimal_places=2, required=True, label='Amount', widget=forms.NumberInput(attrs={'step': '0.01'}))
+    recvacc= forms.CharField(label='Reciever Account Number', required=True)
+
+    def __init__(self, *args, **kwargs):
+        accno_choices = kwargs.pop('accno_choices', [])
+        super(SendMoneyForm, self).__init__(*args, **kwargs)
         self.fields['accno'].choices = accno_choices

@@ -2,7 +2,7 @@ from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
-from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm
+from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account, Transaction
 from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account
 from django.db import transaction
@@ -392,10 +392,64 @@ def delete_employee(request):
 
 
 def send_money(request):
-    return render(request, 'empApp/send-money.html')
+    try:
+        customer = Customer.objects.get(customerid=request.user.username)
+        accounts = AccOwner.objects.filter(customerid=request.user.username)
+        accno_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.accno.balance})") for account in accounts if account.accno.type=="Checking"]
+        if not accounts.exists() or not accno_choices:
+            return render(request, 'empApp/send-money.html', {'msg': 'No Checking Bank Accounts Found'})
+    except Customer.DoesNotExist:
+        return render(request, 'empApp/send-money.html', {'msg': 'Unable to fetch Customer'})
 
-def receive_money(request):
-    pass
+    if request.method == 'POST':
+        form = SendMoneyForm(
+            request.POST, 
+            accno_choices=accno_choices,
+            )        
+        if form.is_valid():
+            accountNo = form.cleaned_data['accno']
+            sendAmount = form.cleaned_data['amount']
+            recvAccount = form.cleaned_data['recvacc']
+
+            recvAcc = Account.objects.get(accno=recvAccount)
+
+            if recvAcc.type == "Checking":
+                try:
+                    account = Account.objects.get(accno=accountNo)
+                    if account.balance-sendAmount > 0:
+                        with transaction.atomic():
+                            custTransaction = Transaction.objects.create(
+                                customerid = customer.customerid,
+                                accno = accountNo,
+                                date = timezone.now().date(),
+                                time = timezone.now().time(),
+                                code = 'WD',
+                                amount = sendAmount
+                            )
+                            
+                            account.balance -= sendAmount
+                            account.save()
+
+                            recvAcc.balance += sendAmount
+                            recvAcc.save()
+
+                            form = SendMoneyForm(accno_choices=accno_choices)
+                            return render(request, 'empApp/send-money.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
+                    form = SendMoneyForm(accno_choices=accno_choices)
+                    return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
+                except Account.DoesNotExist:
+                    form = SendMoneyForm(accno_choices=accno_choices)
+                    return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Unable to Process Account'})
+            return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Receiver not a valid checking Account'})
+        print(form.errors)
+        return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Transaction Unsuccesful'})
+        
+    else:
+        form = SendMoneyForm(accno_choices=accno_choices)
+    return render(request, 'empApp/send-money.html', {'form': form})
+
+
+
 
 
 def withdraw(request):
@@ -432,7 +486,7 @@ def withdraw(request):
                         account.balance -= withdrawAmount
                         account.save()
                         form = TransactionForm(accno_choices=accno_choices)
-                        return render(request, 'empApp/withdraw.html', {'form': form, 'msg':f"Transaction Succesful: avaulable balance {account.balance}"})
+                        return render(request, 'empApp/withdraw.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
                 form = TransactionForm(accno_choices=accno_choices)
                 return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
             except Account.DoesNotExist:
