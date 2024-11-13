@@ -89,7 +89,7 @@
         <div class="Alert">{{ msg }}<br></div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" onsubmit="return confirmDelete()">
         {% csrf_token %}
 
         <div class="form-row">
@@ -107,4 +107,11 @@
         <button type="submit" class="btn btn-primary">Withdraw</button>
     </form>
 </div>
+
+<script>
+    function confirmDelete() {
+        // Show confirmation dialog before submitting the form
+        return confirm("Do you want to proceed with this transaction?");
+    }
+</script>
 {% endblock %}

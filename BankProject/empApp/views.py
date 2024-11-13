@@ -413,17 +413,10 @@ def withdraw(request):
         return render(request, 'empApp/withdraw.html', {'msg': 'Unable to fetch Customer'})
 
     if request.method == 'POST':
-        #print(request.POST)
         form = TransactionForm(
             request.POST, 
             accno_choices=accno_choices,
-            )
-        '''form.instance.cssn = customer
-        form.instance.date = timezone.now().date()
-        form.instance.time = timezone.now().time() 
-        form.instance.code = 'WD'
-        '''
-        
+            )        
         if form.is_valid():
             accountNo = form.cleaned_data['accno']
             withdrawAmount = form.cleaned_data['amount']
@@ -442,9 +435,12 @@ def withdraw(request):
                         
                         account.balance -= withdrawAmount
                         account.save()
+                        form = TransactionForm(accno_choices=accno_choices)
                         return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Succesful'})
+                form = TransactionForm(accno_choices=accno_choices)
                 return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
             except Account.DoesNotExist:
+                form = TransactionForm(accno_choices=accno_choices)
                 return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Unable to Process Account'})
         print(form.errors)
         return render(request, 'empApp/withdraw.html', {'form': form, 'msg':'Transaction Unsuccesful'})
