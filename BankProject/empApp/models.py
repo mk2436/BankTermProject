@@ -116,7 +116,7 @@ class Loans(models.Model):
     accno = models.ForeignKey(Account, on_delete=models.CASCADE, db_column='AccNo', blank=True, null=True)  # Field name made lowercase.
     bid = models.ForeignKey(Branch, on_delete=models.SET_NULL, db_column='BID', blank=True, null=True)  # Field name made lowercase.
     amount = models.DecimalField(db_column='Amount', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    loanno = models.IntegerField(db_column='LoanNo', primary_key=True)  # Field name made lowercase.
+    loanno = models.AutoField(db_column='LoanNo', primary_key=True)  # Field name made lowercase.
     monthlyrepayment = models.DecimalField(db_column='MonthlyRepayment', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:

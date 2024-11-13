@@ -2,7 +2,7 @@ from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
-from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm
+from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account, Transaction
 from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account
 from django.db import transaction
@@ -542,3 +542,81 @@ def deposit(request):
     else:
         form = TransactionForm(accno_choices=accno_choices)
     return render(request, 'empApp/deposit.html', {'form': form})
+
+
+
+
+
+
+
+
+
+@role_required('manager', 'assistanMgr', 'employee', login_url='/')
+def open_loan(request):
+    try:
+        customers = Customer.objects.all()
+    except Exception as e:
+        return render(request, 'empApp/open-loan.html', {'msg':f'Error!! {e}'})
+    
+    if request.method == 'POST':
+        if 'search_query' in request.POST:
+            try:
+                search_query = request.POST.get('search_query')
+                customer = Customer.objects.get(customerid=search_query)
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'data':customer})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':'Customer Not Found'})
+        elif 'customer' in request.POST:
+            try:
+                customer_id = request.POST.get('customer')
+                customer = Customer.objects.get(customerid=customer_id)
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'data':customer})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':'Customer Not Found'})
+            
+        elif 'select' in request.POST:
+            try:
+                selectID = request.POST.get('select')
+                customer = Customer.objects.get(customerid=selectID)
+
+                initial_data = {
+                    'accno':'',
+                    'balance': '100',
+                    'type' :'',
+                    'interestsrate': '',
+                    'overdraft' :'',
+                    'customerid': customer
+                }
+                openAccountForm = CreateAccountForm(initial=initial_data)
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Selected Customer:{customer.customerid}", 'oaform':openAccountForm})
+            except Exception as e:
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Error! {e}"})
+                
+        elif 'oaform' in request.POST:
+            openAccountForm = CreateAccountForm(request.POST)
+            #print(request.POST)
+            if openAccountForm.is_valid():
+                try:
+                    with transaction.atomic():
+                        accData = openAccountForm.save(commit=False)
+                        accData.recentaccess = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        accData.save()
+                        customer = Customer.objects.get(customerid=request.POST.get('customerid'))
+                        """
+                        accOwner = AccOwner.objects.create(accno=accData,customerid=customer)
+                        print(accOwner.accno, accOwner.customerid)
+                        accOwner.save()
+                        """
+                        data = add_accowner(request.POST.get('customerid'),accData.accno)
+                        if data:
+                            return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Created"})
+                        return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Creation Failed", 'oaform':openAccountForm})      
+                except Exception as e:
+                    openAccountForm = CreateAccountForm()
+                    return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Failed to create Account {e}", 'oaform':openAccountForm})
+            else:
+                openAccountForm = CreateAccountForm()
+                return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Form Invalid", 'oaform':openAccountForm})
+        elif 'action' in request.POST and request.POST.get('action') == 'list_all':
+            return render(request, 'empApp/open-loan.html', {'customers': customers, 'data':customers})
+    return render(request, 'empApp/open-loan.html', {'customers': customers})

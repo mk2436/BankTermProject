@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account, AccOwner, Customer, Transaction
+from .models import Account, AccOwner, Customer, Loans
 from django.core.exceptions import ValidationError
 
 from django import forms
@@ -144,3 +144,17 @@ class SendMoneyForm(forms.Form):
         accno_choices = kwargs.pop('accno_choices', [])
         super(SendMoneyForm, self).__init__(*args, **kwargs)
         self.fields['accno'].choices = accno_choices
+
+
+class OpenLoanForm(forms.ModelForm):
+    class Meta:
+        model = Loans
+        fields = ['customerid', 'accno','bid','amount', 'loanno', 'monthlyrepayment']
+        labels = {
+            'customerid': 'Customer ID', 
+            'accno': 'Account No',
+            'bid' : 'Branch ID',
+            'amount': 'Amount', 
+            'loanno': 'Loan No', 
+            'monthlyrepayment': 'Monthly Payment',
+        }
