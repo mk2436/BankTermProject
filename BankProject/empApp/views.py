@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account, Transaction, Loans
-from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account
+from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account, add_loan
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -556,7 +556,7 @@ def open_loan(request):
     try:
         customers = Customer.objects.all()
         currentEmp = Employee.objects.get(empid = request.user.username)
-        print(currentEmp.bid)
+        #print(currentEmp.bid)
     except Exception as e:
         return render(request, 'empApp/open-loan.html', {'msg':f'Error!! {e}'})
     
@@ -581,9 +581,9 @@ def open_loan(request):
                 selectID = request.POST.get('select')
                 customer = Customer.objects.get(customerid=selectID)
 
-                print(currentEmp.bid)
+                #print(currentEmp.bid)
                 initial_data = {
-                    'customerid': customer,
+                    'customerid': customer.customerid,
                     'bid': currentEmp.bid,
                 }
                 openLoanForm = OpenLoanForm(initial=initial_data)
@@ -593,36 +593,31 @@ def open_loan(request):
                 
         elif 'oaform' in request.POST:
             openLoanForm = OpenLoanForm(request.POST)
-            print(request.POST)
+            #print(request.POST)
             if openLoanForm.is_valid():
                 try:
                     with transaction.atomic():
                         customer = openLoanForm.cleaned_data['customerid']
-                        print(customer)
+                        print(type(customer.customerid))
                         bid = openLoanForm.cleaned_data['bid']
                         amount = openLoanForm.cleaned_data['amount']
                         interestRate = openLoanForm.cleaned_data['interestrate']
                         monthlyrepayment = openLoanForm.cleaned_data['monthlyrepayment']
 
                         loanAmount = amount+(amount*(interestRate/100))
+                        #print(loanAmount)
+
                         loanAccount = Account.objects.create(
                             balance= amount,
                             type="Loan",
                             interestsrate= interestRate,
-                            customerid= customer,
+                            recentaccess = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         )
 
-                        loan = Loans.objects.create(
-                            customerid = customer,
-                            accno = loanAccount,
-                            bid = bid,
-                            amount = amount,
-                            monthlyrepayment = monthlyrepayment,
-                            outstandingamount = loanAmount
-                        )
+                        data = add_loan(customer.customerid,loanAccount.accno,bid,loanAmount,monthlyrepayment,loanAmount)
                         if data:
                             return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Created"})
-                        return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Creation Failed", 'oaform':openLoanForm})      
+                    return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Creation Failed", 'oaform':openLoanForm})      
                 except Exception as e:
                     openLoanForm = OpenLoanForm()
                     return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Failed to create Account {e}", 'oaform':openLoanForm})

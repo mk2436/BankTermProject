@@ -97,3 +97,18 @@ def list_account(accno):
             return rows
     except Exception as e:
         return
+    
+def add_loan(customerid,accno,bid,amount,monthlyrepayment,outstandingamount):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                INSERT INTO LOANS (CustomerID, AccNo, BID, Amount, LoanNo, MonthlyRepayment) VALUES
+                ({customerid},{accno},{bid},{amount},{monthlyrepayment},{outstandingamount});
+                """
+            )
+            rows = cursor.fetchall()
+            return rows
+    except Exception as e:
+        print(e)
+        return
