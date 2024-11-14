@@ -15,10 +15,10 @@ def user_profile(request):
             id = customer.customerid
             name = customer.name
             personalBanker = PersonalBanker.objects.get(customerid=id)
-            bid = personalBanker.essn.bid.bid
+            bid = personalBanker.empid.bid.bid
             data = {'name':name, 'id': id}
             branch = {}
-            banker = {'name':personalBanker.essn.name, 'teleno': personalBanker.essn.teleno,'bid':bid}
+            banker = {'name':personalBanker.empid.name, 'teleno': personalBanker.empid.teleno,'bid':bid}
         elif request.user.user_type in ("manager", "assistanMgr") :
             employee = Employee.objects.get(empid=username)
             name = employee.name

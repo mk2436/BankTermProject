@@ -118,7 +118,8 @@ class Loans(models.Model):
     amount = models.DecimalField(db_column='Amount', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
     loanno = models.AutoField(db_column='LoanNo', primary_key=True)  # Field name made lowercase.
     monthlyrepayment = models.DecimalField(db_column='MonthlyRepayment', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-
+    outstandingamount = models.DecimalField(db_column='OutstandingAmount', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
+    
     class Meta:
         managed = False
         db_table = 'loans'
@@ -136,7 +137,7 @@ class Manager(models.Model):
 class PersonalBanker(models.Model):
     customerid = models.OneToOneField(Customer, on_delete=models.CASCADE, db_column='CustomerID', to_field='customerid', primary_key=True)  # Field name made lowercase.
     bid = models.ForeignKey(Branch, on_delete=models.SET_NULL, db_column='BID', blank=True, null=True)  # Field name made lowercase.
-    essn = models.ForeignKey(Employee, on_delete=models.SET_NULL, db_column='ESSN', to_field='ssn',blank=True, null=True)  # Field name made lowercase.
+    empid = models.ForeignKey(Employee, on_delete=models.SET_NULL, db_column='EMPID', to_field='empid',blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

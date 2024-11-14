@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account, AccOwner, Customer, Loans
+from .models import Account, AccOwner, Customer, Loans, Branch
 from django.core.exceptions import ValidationError
 
 from django import forms
@@ -146,15 +146,35 @@ class SendMoneyForm(forms.Form):
         self.fields['accno'].choices = accno_choices
 
 
-class OpenLoanForm(forms.ModelForm):
-    class Meta:
-        model = Loans
-        fields = ['customerid', 'accno','bid','amount', 'loanno', 'monthlyrepayment']
-        labels = {
-            'customerid': 'Customer ID', 
-            'accno': 'Account No',
-            'bid' : 'Branch ID',
-            'amount': 'Amount', 
-            'loanno': 'Loan No', 
-            'monthlyrepayment': 'Monthly Payment',
-        }
+class OpenLoanForm(forms.Form):
+    customerid = forms.ModelChoiceField(
+        queryset=Customer.objects.all(),
+        label='Customer ID',
+        widget=forms.HiddenInput,
+        required=True  # Make customerid field required
+    )
+    
+
+    bid = forms.ModelChoiceField(
+        queryset= Branch.objects.all(),
+        label='BID',
+        widget=forms.HiddenInput,
+        required=True  # Make customerid field required
+    )
+
+    amount = forms.DecimalField(
+        label="Loan Amount",
+        required=True
+    )
+
+    monthlyrepayment = forms.DecimalField(
+        label="Monthly Repayment",
+        required=True
+    )
+
+    interestrate = forms.DecimalField(
+        label="Interest Rate",
+        required=True
+    )
+
+     
