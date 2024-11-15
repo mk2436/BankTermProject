@@ -598,14 +598,13 @@ def open_loan(request):
                 try:
                     with transaction.atomic():
                         customer = openLoanForm.cleaned_data['customerid']
-                        print(type(customer.customerid))
+                        #print(type(customer.customerid))
                         bid = openLoanForm.cleaned_data['bid']
                         amount = openLoanForm.cleaned_data['amount']
                         interestRate = openLoanForm.cleaned_data['interestrate']
                         monthlyrepayment = openLoanForm.cleaned_data['monthlyrepayment']
 
                         loanAmount = amount+(amount*(interestRate/100))
-                        #print(loanAmount)
 
                         loanAccount = Account.objects.create(
                             balance= amount,
@@ -614,10 +613,10 @@ def open_loan(request):
                             recentaccess = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         )
 
-                        data = add_loan(customer.customerid,loanAccount.accno,bid,loanAmount,monthlyrepayment,loanAmount)
+                        data = add_loan(customer.customerid,loanAccount.accno,bid.bid,loanAmount,monthlyrepayment,loanAmount)
                         if data:
-                            return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Created"})
-                    return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Creation Failed", 'oaform':openLoanForm})      
+                            return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Loan Account Created"})
+                        return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Account Creation Failed", 'oaform':openLoanForm})      
                 except Exception as e:
                     openLoanForm = OpenLoanForm()
                     return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Failed to create Account {e}", 'oaform':openLoanForm})

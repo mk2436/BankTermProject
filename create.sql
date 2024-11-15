@@ -200,6 +200,11 @@ SELECT *
 FROM customer AS c
 LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
 LEFT JOIN account AS p ON p.accno = a.accno;
+UNION
+SELECT *
+FROM customer AS c
+LEFT JOIN loans AS a ON c.customerid = a.customerid
+LEFT JOIN account AS p ON p.accno = a.accno;
 
 SELECT *
 FROM customer AS c
@@ -215,3 +220,23 @@ LEFT JOIN customer c ON c.customerid = p.customerid
 ;
 
 select * from transaction;
+select * from loans;
+
+delete from loans where loanno=12;
+
+select * from account;
+delete from account where accno = 3400045;
+
+
+
+
+
+SELECT *
+FROM customer AS c
+LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
+LEFT JOIN account AS p ON p.accno = a.accno
+UNION
+SELECT *
+FROM customer AS c
+LEFT JOIN loans AS l ON c.customerid = l.customerid
+LEFT JOIN account AS p ON p.accno = l.accno;
