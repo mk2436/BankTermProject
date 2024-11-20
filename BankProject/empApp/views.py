@@ -2,7 +2,7 @@ from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
-from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm, PayLoanForm
+from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm, PayLoanForm, LoanStatusForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account, Transaction, Loans
 from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account, add_loan
 from django.db import transaction
@@ -713,3 +713,69 @@ def pay_loan(request):
         form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
     return render(request, 'empApp/pay-loan.html', {'form': form})
 
+'''
+def loan_status(request):
+    try:
+        customer = Customer.objects.get(customerid=request.user.username)
+        loans = Loans.objects.filter(customerid=request.user.username)
+        loan_acc_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.amount})") for account in loans if account.accno.type=="Loan"]
+        if not loans.exists() or not loan_acc_choices:
+            return render(request, 'empApp/pay-loan.html', {'msg': 'No Loands Found'})
+    except Customer.DoesNotExist:
+        return render(request, 'empApp/pay-loan.html', {'msg': 'Unable to fetch Customer'})
+
+    if request.method == 'POST':
+        form = LoanStatusForm(
+            request.POST, 
+            loanAccno_choices = loan_acc_choices,
+            )        
+        if form.is_valid():
+            loanAccountNo = form.cleaned_data['loanAccno']
+            try:
+                loanAccount = Loans.objects.get(accno=loanAccountNo)
+                form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
+                return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
+            except Account.DoesNotExist:
+                form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
+                return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Unable to Process Account'})
+        print(form.errors)
+        return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful'})
+        
+    else:
+        form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
+    return render(request, 'empApp/pay-loan.html', {'form': form})
+
+'''
+
+
+def loan_status(request):
+    try:
+        loans = Loans.objects.filter(customerid=request.user.username)
+    except Exception as e:
+        return render(request, 'empApp/loan-status.html', {'msg':f'Error!! {e}'})
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        loanNum = request.POST.get('loan')
+        action = request.POST.get('action')
+        deleteid = request.POST.get('delete')
+        if search_query:
+            try:
+                loan = Loans.objects.get(loanno=search_query)
+                #data = list_user(search_query)
+                #if data:
+                return render(request, 'empApp/loan-status.html', {'loans': loans, 'data': loan})
+                return render(request, 'empApp/loan-status.html', {'loans': loans, 'msg': 'Unable to Fecth Loan'})
+            except Loans.DoesNotExist as e:
+                return render(request, 'empApp/loan-status.html', {'loans': loans, 'msg':'Loan Not Found'})
+        elif loanNum:
+            try:
+                loan= Loans.objects.get(loanno=loanNum)
+                return render(request, 'empApp/loan-status.html', {'loans': loans, 'data':loan})
+                return render(request, 'empApp/loan-status.html', {'loans': loans, 'msg': 'Unable to Fecth User'}) 
+            except Loans.DoesNotExist as e:
+                return render(request, 'empApp/loan-status.html', {'loans': loans, 'msg':'Loan Not Found'})
+        elif action=="list_all":
+            return render(request, 'empApp/loan-status.html', {'loans': loans, 'data':loans})
+            return render(request, 'empApp/loan-status.html', {'loans': loans, 'msg':'Unable the Fetch all users'})            
+    return render(request, 'empApp/loan-status.html', {'loans': loans})

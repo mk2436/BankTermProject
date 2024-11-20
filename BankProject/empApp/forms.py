@@ -200,3 +200,12 @@ class PayLoanForm(forms.Form):
         super(PayLoanForm, self).__init__(*args, **kwargs)
         self.fields['accno'].choices = accno_choices
         self.fields['loanAccno'].choices = loanAccno_choices
+
+
+class LoanStatusForm(forms.Form):
+    loanAccno = forms.ChoiceField(label='Loan Account Number') 
+    
+    def __init__(self, *args, **kwargs):
+        loanAccno_choices = kwargs.pop('loanAccno_choices', [])
+        super(PayLoanForm, self).__init__(*args, **kwargs)
+        self.fields['loanAccno'].choices = loanAccno_choices
