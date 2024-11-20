@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Withdraw Money{% endblock %}
+{% block title %}Pay Loan{% endblock %}
 
 {% block content %}
 <style>
@@ -85,7 +85,7 @@
 
 
 <div class="container">
-    <h2>Send Money</h2>
+    <h2>Pay Loan</h2>
 
     {% if msg %}
         <div class="Alert">{{ msg }}<br></div>
@@ -101,8 +101,8 @@
             </div>
 
             <div class="form-group">
-                <label for="{{ form.recvacc.id_for_label }}">{{ form.recvacc.label }}</label>
-                {{ form.recvacc }}
+                <label for="{{ form.loanAccno.id_for_label }}">{{ form.loanAccno.label }}</label>
+                {{ form.loanAccno }}
             </div>
 
             <div class="form-group">
@@ -111,7 +111,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Send</button>
+        <button type="submit" class="btn btn-primary">Pay</button>
     </form>
 </div>
 

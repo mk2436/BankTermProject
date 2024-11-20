@@ -2,7 +2,7 @@ from django.db import IntegrityError, connection
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
-from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm
+from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm, PayLoanForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account, Transaction, Loans
 from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account, add_loan
 from django.db import transaction
@@ -658,49 +658,58 @@ def pay_loan(request):
         return render(request, 'empApp/pay-loan.html', {'msg': 'Unable to fetch Customer'})
 
     if request.method == 'POST':
-        form = SendMoneyForm(
+        form = PayLoanForm(
             request.POST, 
             accno_choices=accno_choices,
+            loanAccno_choices = loan_acc_choices,
             )        
         if form.is_valid():
             accountNo = form.cleaned_data['accno']
             sendAmount = form.cleaned_data['amount']
-            recvAccount = form.cleaned_data['recvacc']
+            loanAccountNo = form.cleaned_data['loanAccno']
 
-            recvAcc = Account.objects.get(accno=recvAccount)
+            
+            try:
+                account = Account.objects.get(accno=accountNo)
+                loanAccount = Loans.objects.get(accno=loanAccountNo)
+                if account.balance-sendAmount > 0:
+                    with transaction.atomic():
+                        custTransaction = Transaction.objects.create(
+                            customerid = customer.customerid,
+                            accno = accountNo,
+                            date = timezone.now().date(),
+                            time = timezone.now().time(),
+                            code = 'WD',
+                            amount = sendAmount
+                        )
+                        
+                        loanTransaction = Transaction.objects.create(
+                            customerid = customer.customerid,
+                            accno = loanAccountNo,
+                            date = timezone.now().date(),
+                            time = timezone.now().time(),
+                            code = 'CD',
+                            amount = sendAmount
+                        )
+                        
+                        account.balance -= sendAmount
+                        account.save()
 
-            if recvAcc.type == "Checking":
-                try:
-                    account = Account.objects.get(accno=accountNo)
-                    if account.balance-sendAmount > 0:
-                        with transaction.atomic():
-                            custTransaction = Transaction.objects.create(
-                                customerid = customer.customerid,
-                                accno = accountNo,
-                                date = timezone.now().date(),
-                                time = timezone.now().time(),
-                                code = 'WD',
-                                amount = sendAmount
-                            )
-                            
-                            account.balance -= sendAmount
-                            account.save()
+                        loanAccount.outstandingamount -= sendAmount
+                        loanAccount.save()
+                        
 
-                            recvAcc.balance += sendAmount
-                            recvAcc.save()
-
-                            form = SendMoneyForm(accno_choices=accno_choices)
-                            return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
-                    form = SendMoneyForm(accno_choices=accno_choices)
-                    return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
-                except Account.DoesNotExist:
-                    form = SendMoneyForm(accno_choices=accno_choices)
-                    return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Unable to Process Account'})
-            return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Receiver not a valid checking Account'})
+                        form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
+                        return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
+                form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
+                return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
+            except Account.DoesNotExist:
+                form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
+                return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Unable to Process Account'})
         print(form.errors)
         return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful'})
         
     else:
-        form = SendMoneyForm(accno_choices=accno_choices)
+        form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
     return render(request, 'empApp/pay-loan.html', {'form': form})
 

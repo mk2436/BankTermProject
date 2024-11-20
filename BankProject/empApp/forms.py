@@ -187,3 +187,16 @@ class SendMoneyForm(forms.Form):
         accno_choices = kwargs.pop('accno_choices', [])
         super(SendMoneyForm, self).__init__(*args, **kwargs)
         self.fields['accno'].choices = accno_choices
+
+
+class PayLoanForm(forms.Form):
+    accno = forms.ChoiceField(label='Account Number')
+    loanAccno = forms.ChoiceField(label='Loan Account Number') 
+    amount = forms.DecimalField(max_digits=15, decimal_places=2, required=True, label='Amount', widget=forms.NumberInput(attrs={'step': '0.01'}))
+
+    def __init__(self, *args, **kwargs):
+        accno_choices = kwargs.pop('accno_choices', [])
+        loanAccno_choices = kwargs.pop('loanAccno_choices', [])
+        super(PayLoanForm, self).__init__(*args, **kwargs)
+        self.fields['accno'].choices = accno_choices
+        self.fields['loanAccno'].choices = loanAccno_choices
