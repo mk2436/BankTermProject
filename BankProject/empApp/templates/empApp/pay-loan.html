@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Withdraw Money{% endblock %}
+
+{% block content %}
+<style>
+    /* Enhanced form styles */
+    .Alert {
+        text-align: center;
+        padding: 12px;
+        background-color: #ffecb3;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .container {
+        width: 100%;
+        max-width: 500px; /* Updated width */
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        flex: 0 0 calc(48% - 10px);
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn-primary {
+        width: 20%;
+        background-color: #28a745; /* Updated color */
+        border: none;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        margin: 15px auto 0 auto; /* Centers the button */
+        display: block;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838; /* Slightly darker green for hover effect */
+    }
+</style>
+
+
+<div class="container">
+    <h2>Send Money</h2>
+
+    {% if msg %}
+        <div class="Alert">{{ msg }}<br></div>
+    {% endif %}
+
+    <form method="post" onsubmit="return confirmDelete()">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.accno.id_for_label }}">{{ form.accno.label }}</label>
+                {{ form.accno }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.recvacc.id_for_label }}">{{ form.recvacc.label }}</label>
+                {{ form.recvacc }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }}</label>
+                {{ form.amount }}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+</div>
+
+<script>
+    function confirmDelete() {
+        // Show confirmation dialog before submitting the form
+        return confirm("Do you want to proceed with this transaction?");
+    }
+</script>
+{% endblock %}

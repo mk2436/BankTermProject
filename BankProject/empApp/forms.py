@@ -177,4 +177,13 @@ class OpenLoanForm(forms.Form):
         required=True
     )
 
-     
+
+class SendMoneyForm(forms.Form):
+    accno = forms.ChoiceField(label='Account Number')
+    amount = forms.DecimalField(max_digits=15, decimal_places=2, required=True, label='Amount', widget=forms.NumberInput(attrs={'step': '0.01'}))
+    recvacc= forms.CharField(label='Reciever Account Number', required=True)
+
+    def __init__(self, *args, **kwargs):
+        accno_choices = kwargs.pop('accno_choices', [])
+        super(SendMoneyForm, self).__init__(*args, **kwargs)
+        self.fields['accno'].choices = accno_choices

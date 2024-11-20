@@ -418,7 +418,7 @@ def send_money(request):
                     account = Account.objects.get(accno=accountNo)
                     if account.balance-sendAmount > 0:
                         with transaction.atomic():
-                            custTransaction = Transaction.objects.create(
+                            WDTransaction = Transaction.objects.create(
                                 customerid = customer.customerid,
                                 accno = accountNo,
                                 date = timezone.now().date(),
@@ -426,6 +426,20 @@ def send_money(request):
                                 code = 'WD',
                                 amount = sendAmount
                             )
+                            '''
+                            NEEDS WORK
+
+
+                            
+                            WDTransaction = Transaction.objects.create(
+                                customerid = customer.customerid,
+                                accno = recvAcc.accno,
+                                date = timezone.now().date(),
+                                time = timezone.now().time(),
+                                code = 'CD',
+                                amount = sendAmount
+                            )
+                            '''
                             
                             account.balance -= sendAmount
                             account.save()
@@ -639,9 +653,9 @@ def pay_loan(request):
         loans = Loans.objects.filter(customerid=request.user.username)
         loan_acc_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.amount})") for account in loans if account.accno.type=="Loan"]
         if not accounts.exists() or not accno_choices:
-            return render(request, 'empApp/send-money.html', {'msg': 'No Checking Bank Accounts Found'})
+            return render(request, 'empApp/pay-loan.html', {'msg': 'No Checking Bank Accounts Found'})
     except Customer.DoesNotExist:
-        return render(request, 'empApp/send-money.html', {'msg': 'Unable to fetch Customer'})
+        return render(request, 'empApp/pay-loan.html', {'msg': 'Unable to fetch Customer'})
 
     if request.method == 'POST':
         form = SendMoneyForm(
@@ -676,16 +690,17 @@ def pay_loan(request):
                             recvAcc.save()
 
                             form = SendMoneyForm(accno_choices=accno_choices)
-                            return render(request, 'empApp/send-money.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
+                            return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
                     form = SendMoneyForm(accno_choices=accno_choices)
-                    return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
+                    return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
                 except Account.DoesNotExist:
                     form = SendMoneyForm(accno_choices=accno_choices)
-                    return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Unable to Process Account'})
-            return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Receiver not a valid checking Account'})
+                    return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Unable to Process Account'})
+            return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Receiver not a valid checking Account'})
         print(form.errors)
-        return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Transaction Unsuccesful'})
+        return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful'})
         
     else:
         form = SendMoneyForm(accno_choices=accno_choices)
-    return render(request, 'empApp/send-money.html', {'form': form})
+    return render(request, 'empApp/pay-loan.html', {'form': form})
+
