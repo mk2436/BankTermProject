@@ -413,6 +413,8 @@ def send_money(request):
 
             recvAcc = Account.objects.get(accno=recvAccount)
 
+            recvCustomer = AccOwner.objects.get(accno=recvAcc)
+
             if recvAcc.type == "Checking":
                 try:
                     account = Account.objects.get(accno=accountNo)
@@ -426,26 +428,24 @@ def send_money(request):
                                 code = 'WD',
                                 amount = sendAmount
                             )
-                            '''
-                            NEEDS WORK
-
-
                             
-                            WDTransaction = Transaction.objects.create(
-                                customerid = customer.customerid,
+
+                            CDTransaction = Transaction.objects.create(
+                                customerid = recvCustomer.customerid.customerid,
                                 accno = recvAcc.accno,
                                 date = timezone.now().date(),
                                 time = timezone.now().time(),
                                 code = 'CD',
                                 amount = sendAmount
                             )
-                            '''
                             
                             account.balance -= sendAmount
-                            account.save()
 
                             recvAcc.balance += sendAmount
+                            account.save()
                             recvAcc.save()
+                            WDTransaction.save()
+                            CDTransaction.save()
 
                             form = SendMoneyForm(accno_choices=accno_choices)
                             return render(request, 'empApp/send-money.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})

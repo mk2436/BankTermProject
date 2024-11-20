@@ -358,3 +358,13 @@ HAVING SUM(Balance) > ALL (
     GROUP BY CustomerID
 );
 
+SELECT CustomerID, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+JOIN ACC_OWNER ON ACCOUNT.AccNo = ACC_OWNER.AccNo
+WHERE CustomerID IN (
+    SELECT CustomerID
+    FROM PERSONAL_BANKER
+)
+GROUP BY CustomerID
+HAVING SUM(Balance) > 2000;
+
