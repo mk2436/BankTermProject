@@ -713,40 +713,6 @@ def pay_loan(request):
         form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
     return render(request, 'empApp/pay-loan.html', {'form': form})
 
-'''
-def loan_status(request):
-    try:
-        customer = Customer.objects.get(customerid=request.user.username)
-        loans = Loans.objects.filter(customerid=request.user.username)
-        loan_acc_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.amount})") for account in loans if account.accno.type=="Loan"]
-        if not loans.exists() or not loan_acc_choices:
-            return render(request, 'empApp/pay-loan.html', {'msg': 'No Loands Found'})
-    except Customer.DoesNotExist:
-        return render(request, 'empApp/pay-loan.html', {'msg': 'Unable to fetch Customer'})
-
-    if request.method == 'POST':
-        form = LoanStatusForm(
-            request.POST, 
-            loanAccno_choices = loan_acc_choices,
-            )        
-        if form.is_valid():
-            loanAccountNo = form.cleaned_data['loanAccno']
-            try:
-                loanAccount = Loans.objects.get(accno=loanAccountNo)
-                form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
-                return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
-            except Account.DoesNotExist:
-                form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
-                return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Unable to Process Account'})
-        print(form.errors)
-        return render(request, 'empApp/pay-loan.html', {'form': form, 'msg':'Transaction Unsuccesful'})
-        
-    else:
-        form = PayLoanForm(accno_choices=accno_choices, loanAccno_choices = loan_acc_choices)
-    return render(request, 'empApp/pay-loan.html', {'form': form})
-
-'''
-
 
 def loan_status(request):
     try:
