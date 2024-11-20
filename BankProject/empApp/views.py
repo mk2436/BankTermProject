@@ -627,3 +627,65 @@ def open_loan(request):
         elif 'action' in request.POST and request.POST.get('action') == 'list_all':
             return render(request, 'empApp/open-loan.html', {'customers': customers, 'data':customers})
     return render(request, 'empApp/open-loan.html', {'customers': customers})
+
+
+
+
+def pay_loan(request):
+    try:
+        customer = Customer.objects.get(customerid=request.user.username)
+        accounts = AccOwner.objects.filter(customerid=request.user.username)
+        accno_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.accno.balance})") for account in accounts if account.accno.type=="Checking"]
+        loans = Loans.objects.filter(customerid=request.user.username)
+        loan_acc_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.amount})") for account in loans if account.accno.type=="Loan"]
+        if not accounts.exists() or not accno_choices:
+            return render(request, 'empApp/send-money.html', {'msg': 'No Checking Bank Accounts Found'})
+    except Customer.DoesNotExist:
+        return render(request, 'empApp/send-money.html', {'msg': 'Unable to fetch Customer'})
+
+    if request.method == 'POST':
+        form = SendMoneyForm(
+            request.POST, 
+            accno_choices=accno_choices,
+            )        
+        if form.is_valid():
+            accountNo = form.cleaned_data['accno']
+            sendAmount = form.cleaned_data['amount']
+            recvAccount = form.cleaned_data['recvacc']
+
+            recvAcc = Account.objects.get(accno=recvAccount)
+
+            if recvAcc.type == "Checking":
+                try:
+                    account = Account.objects.get(accno=accountNo)
+                    if account.balance-sendAmount > 0:
+                        with transaction.atomic():
+                            custTransaction = Transaction.objects.create(
+                                customerid = customer.customerid,
+                                accno = accountNo,
+                                date = timezone.now().date(),
+                                time = timezone.now().time(),
+                                code = 'WD',
+                                amount = sendAmount
+                            )
+                            
+                            account.balance -= sendAmount
+                            account.save()
+
+                            recvAcc.balance += sendAmount
+                            recvAcc.save()
+
+                            form = SendMoneyForm(accno_choices=accno_choices)
+                            return render(request, 'empApp/send-money.html', {'form': form, 'msg':f"Transaction Succesful: available balance {account.balance}"})
+                    form = SendMoneyForm(accno_choices=accno_choices)
+                    return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Transaction Unsuccesful: Low Balance'})
+                except Account.DoesNotExist:
+                    form = SendMoneyForm(accno_choices=accno_choices)
+                    return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Unable to Process Account'})
+            return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Receiver not a valid checking Account'})
+        print(form.errors)
+        return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Transaction Unsuccesful'})
+        
+    else:
+        form = SendMoneyForm(accno_choices=accno_choices)
+    return render(request, 'empApp/send-money.html', {'form': form})

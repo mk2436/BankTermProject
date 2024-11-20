@@ -231,12 +231,12 @@ delete from account where accno = 3400045;
 
 
 
-SELECT *
+SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.aptno, a.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
 FROM customer AS c
 LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
 LEFT JOIN account AS p ON p.accno = a.accno
 UNION
-SELECT *
+SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.aptno, l.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
 FROM customer AS c
 LEFT JOIN loans AS l ON c.customerid = l.customerid
 LEFT JOIN account AS p ON p.accno = l.accno;

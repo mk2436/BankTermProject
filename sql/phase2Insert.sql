@@ -258,3 +258,103 @@ SELECT * FROM PERSONAL_BANKER;
 
 -- Select all from LOANS
 SELECT * FROM LOANS;
+
+
+-- Update and Delete operations for BRANCH table
+UPDATE BRANCH SET Assets = 5500000.00 WHERE BID = 1;
+DELETE FROM BRANCH WHERE BID = 5;
+
+-- Update and Delete operations for EMPLOYEE table
+UPDATE EMPLOYEE SET TeleNo = '555-4321' WHERE SSN = 111111111;
+DELETE FROM EMPLOYEE WHERE EmpID = 1201;
+
+-- Update and Delete operations for MANAGER table
+UPDATE MANAGER SET MANAGER = 222222222 WHERE BID = 1;
+DELETE FROM MANAGER WHERE BID = 5;
+
+-- Update and Delete operations for ASSISTANT_MGR table
+UPDATE ASSISTANT_MGR SET ASSISTANTMANAGER = 555555555 WHERE BID = 2;
+DELETE FROM ASSISTANT_MGR WHERE BID = 5;
+
+-- Update and Delete operations for CUSTOMER table
+UPDATE CUSTOMER SET City = 'Brooklyn' WHERE CustomerID = 100000;
+DELETE FROM CUSTOMER WHERE CustomerID = 100004;
+
+-- Update and Delete operations for ACCOUNT table
+UPDATE ACCOUNT SET Balance = 2000.00 WHERE AccNo = 3400001;
+DELETE FROM ACCOUNT WHERE AccNo = 3400005;
+
+-- Update and Delete operations for ACC_OWNER table
+UPDATE ACC_OWNER SET CustomerID = 100002 WHERE AccNo = 3400001;
+DELETE FROM ACC_OWNER WHERE CustomerID = 100004 AND AccNo = 3400005;
+
+-- Update and Delete operations for TRANSACTION table
+UPDATE TRANSACTION SET Charge = 1.50 WHERE TID = 1;
+DELETE FROM TRANSACTION WHERE TID = 5;
+
+-- Update and Delete operations for PERSONAL_BANKER table
+UPDATE PERSONAL_BANKER SET ESSN = 333333333 WHERE CustomerID = 100000;
+DELETE FROM PERSONAL_BANKER WHERE CustomerID = 100004;
+
+-- Update and Delete operations for LOANS table
+UPDATE LOANS SET MonthlyRepayment = 275.00 WHERE LoanNo = 400001;
+DELETE FROM LOANS WHERE LoanNo = 400005;
+
+
+SELECT Type, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+GROUP BY Type;
+
+SELECT Type, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+GROUP BY Type
+HAVING SUM(Balance) > 5000;
+
+SELECT CustomerID, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+JOIN ACC_OWNER ON ACCOUNT.AccNo = ACC_OWNER.AccNo
+GROUP BY CustomerID
+HAVING SUM(Balance) > ALL (
+    SELECT SUM(Balance)
+    FROM ACCOUNT
+    JOIN ACC_OWNER ON ACCOUNT.AccNo = ACC_OWNER.AccNo
+    WHERE CustomerID = 100000
+    GROUP BY CustomerID
+);
+
+
+SELECT CustomerID, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+JOIN ACC_OWNER ON ACCOUNT.AccNo = ACC_OWNER.AccNo
+WHERE CustomerID IN (
+    SELECT CustomerID
+    FROM PERSONAL_BANKER
+)
+GROUP BY CustomerID
+HAVING SUM(Balance) > 2000;
+
+
+
+SELECT Type, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+GROUP BY Type;
+
+
+SELECT Type, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+GROUP BY Type
+HAVING SUM(Balance) > 5000;
+
+
+SELECT CustomerID, SUM(Balance) AS TotalBalance
+FROM ACCOUNT
+JOIN ACC_OWNER ON ACCOUNT.AccNo = ACC_OWNER.AccNo
+GROUP BY CustomerID
+HAVING SUM(Balance) > ALL (
+    SELECT SUM(Balance)
+    FROM ACCOUNT
+    JOIN ACC_OWNER ON ACCOUNT.AccNo = ACC_OWNER.AccNo
+    WHERE CustomerID = 100000
+    GROUP BY CustomerID
+);
+
