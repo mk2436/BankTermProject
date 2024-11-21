@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from empApp.forms import LoginForm, CreateCustomerForm, CreateEmployeeForm,CreateAccountForm, TransactionForm, SendMoneyForm, OpenLoanForm, PayLoanForm, LoanStatusForm
 from empApp.models import CustomUser, Customer, Employee, PersonalBanker, AccOwner, Account, Transaction, Loans
-from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account, add_loan
+from empApp.utils import list_all_users, list_user, add_accowner, list_all_accounts, list_account, add_loan, cust_list_all_acc
 from django.db import transaction
 from empApp.decorators import role_required
 import datetime
@@ -783,3 +783,31 @@ def list_all_customer(request):
                 return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'data':data})
             return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'msg':'Unable the Fetch all users'})            
     return render(request, 'empApp/list-all-cust.html', {'customers': customers})
+
+
+#@role_required('customer', login_url='/')
+def cust_list_all_account(request):
+    try:
+        accounts = cust_list_all_acc(request.user.username)
+    except Exception as e:
+        return render(request, 'empApp/cust-list-all-acc.html', {'msg':f'Error!! {e}'})
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        acc_number = request.POST.get('account')
+        action = request.POST.get('action')
+        if search_query:
+            try:
+                account = Account.objects.get(accno=search_query)
+                return render(request, 'empApp/cust-list-all-acc.html', {'accounts': accounts, 'data':account})
+            except Account.DoesNotExist as e:
+                return render(request, 'empApp/cust-list-all-acc.html', {'accounts': accounts, 'msg':'Account Not Found'})
+        elif acc_number:
+            try:
+                account = Account.objects.get(accno=acc_number)
+                return render(request, 'empApp/cust-list-all-acc.html', {'accounts': accounts, 'data':account}) 
+            except Account.DoesNotExist as e:
+                return render(request, 'empApp/cust-list-all-acc.html', {'accounts': accounts, 'msg':'Account Not Found'})
+        elif action=="list_all":
+            return render(request, 'empApp/cust-list-all-acc.html', {'accounts': accounts, 'acc_data':accounts})            
+    return render(request, 'empApp/cust-list-all-acc.html', {'accounts': accounts})

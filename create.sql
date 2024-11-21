@@ -240,3 +240,5 @@ SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.a
 FROM customer AS c
 LEFT JOIN loans AS l ON c.customerid = l.customerid
 LEFT JOIN account AS p ON p.accno = l.accno;
+
+as

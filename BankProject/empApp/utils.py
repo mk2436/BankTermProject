@@ -39,11 +39,20 @@ def list_user(customerid):
         with connection.cursor() as cursor:
             cursor.execute(
                 f"""
-                SELECT *
+                
+                SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.aptno, a.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
                 FROM customer AS c
                 LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
                 LEFT JOIN account AS p ON p.accno = a.accno
-                WHERE c.customerid = {customerid} ;
+                WHERE c.customerid = {customerid}
+                UNION
+                SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.aptno, l.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+                FROM customer AS c
+                LEFT JOIN loans AS l ON c.customerid = l.customerid
+                LEFT JOIN account AS p ON p.accno = l.accno
+                WHERE c.customerid = {customerid}
+                ;
+
                 """
             )
             rows = cursor.fetchall()
@@ -115,4 +124,31 @@ def add_loan(customerid,accno,bid,amount,monthlyrepayment,outstandingamount):
             return "success"
     except Exception as e:
         print(e)
+        return
+    
+
+def cust_list_all_acc(customerid):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                
+                SELECT a.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+                FROM customer AS c
+                LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
+                LEFT JOIN account AS p ON p.accno = a.accno
+                WHERE c.customerid = {customerid}
+                UNION
+                SELECT l.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+                FROM customer AS c
+                LEFT JOIN loans AS l ON c.customerid = l.customerid
+                LEFT JOIN account AS p ON p.accno = l.accno
+                WHERE c.customerid = {customerid}
+                ;
+
+                """
+            )
+            rows = cursor.fetchall()
+            return rows
+    except Exception as e:
         return
