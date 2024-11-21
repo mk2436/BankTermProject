@@ -745,3 +745,41 @@ def loan_status(request):
             return render(request, 'empApp/loan-status.html', {'loans': loans, 'data':loans})
             return render(request, 'empApp/loan-status.html', {'loans': loans, 'msg':'Unable the Fetch all users'})            
     return render(request, 'empApp/loan-status.html', {'loans': loans})
+
+
+@role_required('manager', 'assistanMgr', 'employee', login_url='/')
+def list_all_customer(request):
+    try:
+        customers = Customer.objects.all()
+    except Exception as e:
+        return render(request, 'empApp/del-customer.html', {'msg':f'Error!! {e}'})
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        customer_id = request.POST.get('customer')
+        action = request.POST.get('action')
+        deleteid = request.POST.get('delete')
+        if search_query:
+            try:
+                customer = Customer.objects.get(customerid=search_query)
+                data = list_user(search_query)
+                if data:
+                    return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'data':data})
+                return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'msg': 'Unable to Fecth User'})
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'msg':'Customer Not Found'})
+        elif customer_id:
+            try:
+                customer = Customer.objects.get(customerid=customer_id)
+                data = list_user(customer_id)
+                if data:
+                    return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'data':data})
+                return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'msg': 'Unable to Fecth User'}) 
+            except Customer.DoesNotExist as e:
+                return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'msg':'Customer Not Found'})
+        elif action=="list_all":
+            data = list_all_users()
+            if data:
+                return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'data':data})
+            return render(request, 'empApp/list-all-cust.html', {'customers': customers, 'msg':'Unable the Fetch all users'})            
+    return render(request, 'empApp/list-all-cust.html', {'customers': customers})
