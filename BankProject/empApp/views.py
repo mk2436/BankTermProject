@@ -410,11 +410,15 @@ def send_money(request):
             accountNo = form.cleaned_data['accno']
             sendAmount = form.cleaned_data['amount']
             recvAccount = form.cleaned_data['recvacc']
-
-            recvAcc = Account.objects.get(accno=recvAccount)
-
-            recvCustomer = AccOwner.objects.get(accno=recvAcc)
-
+            try:
+                recvAcc = Account.objects.get(accno=recvAccount)
+                recvCustomer = AccOwner.objects.get(accno=recvAcc)
+            except Account.DoesNotExist:
+                form = SendMoneyForm(accno_choices=accno_choices)
+                return render(request, 'empApp/send-money.html', {'form': form, 'msg':'Recipient     Account Not Found'})
+            except AccOwner.DoesNotExist:
+                form = SendMoneyForm(accno_choices=accno_choices)
+                return render(request, 'empApp/send-money.html', {'form': form, 'msg':'No owner found, Account may be inactive'})
             if recvAcc.type == "Checking":
                 try:
                     account = Account.objects.get(accno=accountNo)
