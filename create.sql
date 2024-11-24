@@ -241,4 +241,31 @@ FROM customer AS c
 LEFT JOIN loans AS l ON c.customerid = l.customerid
 LEFT JOIN account AS p ON p.accno = l.accno;
 
-as
+
+
+SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.aptno, a.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+FROM customer AS c
+LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
+LEFT JOIN account AS p ON p.accno = a.accno
+WHERE c.customerid = 100019
+UNION
+SELECT c.customerid, c.cssn, c.name, c.city, c.state, c.zipcode, c.streetno, c.aptno, l.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+FROM customer AS c
+LEFT JOIN loans AS l ON c.customerid = l.customerid
+LEFT JOIN account AS p ON p.accno = l.accno
+WHERE c.customerid = 100019
+;
+
+
+SELECT a.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+                FROM customer AS c
+                LEFT JOIN acc_owner AS a ON c.customerid = a.customerid
+                LEFT JOIN account AS p ON p.accno = a.accno
+                WHERE c.customerid = 100019
+                UNION
+                SELECT l.accno, p.balance, p.type, p.recentaccess, p.interestsrate, p.overdraft
+                FROM customer AS c
+                LEFT JOIN loans AS l ON c.customerid = l.customerid
+                LEFT JOIN account AS p ON p.accno = l.accno
+                WHERE c.customerid = 100019
+                ;

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import make_password
 
 class CustomUser(AbstractUser):
     USER_TYPES = (
@@ -24,6 +25,12 @@ class CustomUser(AbstractUser):
         help_text="Specific permissions for this user.",
         verbose_name="user permissions",
     )
+
+    def save(self, *args, **kwargs):
+        # Ensure the password is hashed before saving
+        if self.password and not self.password.startswith('pbkdf2_sha256$'):
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
 class Account(models.Model):
     SAVINGS = 'Savings'
