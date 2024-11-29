@@ -22,7 +22,7 @@ class CreateAccountForm(forms.ModelForm):
     )
 
     type = forms.ChoiceField(
-        choices=Account.ACCOUNT_TYPE_CHOICES,  # This will use the choices from the Account model
+        choices=Account.OPEN_ACCOUNT_TYPE_CHOICES,  # This will use the choices from the Account model
         required=True,  # Make type field required
         label='Account Type'
     )

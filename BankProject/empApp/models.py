@@ -44,6 +44,13 @@ class Account(models.Model):
         (MONEY_MARKET, 'Money Market'),
         (LOAN, 'Loan'),
     ]
+
+    OPEN_ACCOUNT_TYPE_CHOICES = [
+        (SAVINGS, 'Savings'),
+        (CHECKING, 'Checking'),
+        (MONEY_MARKET, 'Money Market'),
+    ]
+
     
     accno = models.AutoField(db_column='AccNo', primary_key=True)  # Field name made lowercase.
     balance = models.DecimalField(db_column='Balance', max_digits=15, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
