@@ -77,7 +77,7 @@ DATABASES = {
         'NAME': 'bank_phase1',
         'USER': 'ubuntu',
         'PASSWORD': 'BANK@wslubuntu',
-        'HOST': 'localhost',
+        'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {
             'ssl': {'disabled': True}  # Disable SSL
