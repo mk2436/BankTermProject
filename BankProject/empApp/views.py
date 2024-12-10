@@ -395,7 +395,7 @@ def send_money(request):
     try:
         customer = Customer.objects.get(customerid=request.user.username)
         accounts = AccOwner.objects.filter(customerid=request.user.username)
-        accno_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.accno.balance})") for account in accounts if account.accno.type=="Checking"]
+        accno_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.accno.balance})") for account in accounts if account.accno.type=="Checking" or account.accno.type=="Loan"]
         if not accounts.exists() or not accno_choices:
             return render(request, 'empApp/send-money.html', {'msg': 'No Checking Bank Accounts Found'})
     except Customer.DoesNotExist:
@@ -474,7 +474,7 @@ def withdraw(request):
     try:
         customer = Customer.objects.get(customerid=request.user.username)
         accounts = AccOwner.objects.filter(customerid=request.user.username)
-        accno_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.accno.balance})") for account in accounts if account.accno.type=="Checking"]
+        accno_choices = [(account.accno.accno, f"{account.accno.accno}  (${account.accno.balance})") for account in accounts if account.accno.type=="Checking" or account.accno.type=="Loan" ]
         if not accounts.exists() or not accno_choices:
             return render(request, 'empApp/withdraw.html', {'msg': 'No Checking Bank Accounts Found'})
     except Customer.DoesNotExist:
@@ -631,6 +631,12 @@ def open_loan(request):
                             recentaccess = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         )
 
+                        loanCustomer = Customer.objects.get(customerid = customer.customerid)
+
+                        loanAccOwner = AccOwner.objects.create(
+                            customerid = loanCustomer,
+                            accno = loanAccount
+                        )
                         data = add_loan(customer.customerid,loanAccount.accno,bid.bid,loanAmount,monthlyrepayment,loanAmount)
                         if data:
                             return render(request, 'empApp/open-loan.html', {'customers': customers, 'msg':f"Loan Account Created"})
